@@ -1,0 +1,4 @@
+#ifndef OBJRECOGNITION_H
+#define OBJRECOGNITION_H
+
+#endif // OBJRECOGNITION_H
