@@ -5,7 +5,7 @@ const int sdaMotorIndex = 8;
 const int SDA_Pin = 2;
 const int SCL_Pin = 3;
 
-int serInByte[4];
+byte serInByte[4];
 
 void setup() {
   Serial.begin(9600);
@@ -31,6 +31,7 @@ void loop(){
       Serial.println(serInByte[i]);
       Wire.write(serInByte[i]);
     }
+    Wire.endTransmission();
   }
 }
 

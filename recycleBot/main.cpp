@@ -30,6 +30,15 @@ int main(){
     motors();
 }
 
+void followObject(){
+    //Get centroid of object
+
+
+    //Move Motors
+
+   //Delay to account for small move
+}
+
 void serialTest(){
     open();
     stepperMotor();
