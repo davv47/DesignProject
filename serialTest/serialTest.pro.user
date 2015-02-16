@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE QtCreatorProject>
+<<<<<<< HEAD
 <!-- Written by QtCreator 3.3.0, 2015-02-11T16:15:26. -->
+=======
+<!-- Written by QtCreator 3.0.1, 2015-02-15T16:41:53. -->
+>>>>>>> 93b096353ee76a1e5ffcfccb85099005b0c5e219
 <qtcreator>
  <data>
   <variable>EnvironmentId</variable>
@@ -238,7 +242,11 @@
     <valuelist type="QVariantList" key="PE.EnvironmentAspect.Changes"/>
     <value type="QString" key="ProjectExplorer.ProjectConfiguration.DefaultDisplayName">serialTest</value>
     <value type="QString" key="ProjectExplorer.ProjectConfiguration.DisplayName"></value>
+<<<<<<< HEAD
     <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">Qt4ProjectManager.Qt4RunConfiguration:/home/recycle/Code/serialTest/serialTest.pro</value>
+=======
+    <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">Qt4ProjectManager.Qt4RunConfiguration:/home/davv47/Code/designProject/serialTest/serialTest.pro</value>
+>>>>>>> 93b096353ee76a1e5ffcfccb85099005b0c5e219
     <value type="QString" key="Qt4ProjectManager.Qt4RunConfiguration.CommandLineArguments"></value>
     <value type="QString" key="Qt4ProjectManager.Qt4RunConfiguration.ProFile">serialTest.pro</value>
     <value type="bool" key="Qt4ProjectManager.Qt4RunConfiguration.UseDyldImageSuffix">false</value>
