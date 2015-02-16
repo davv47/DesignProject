@@ -50,7 +50,10 @@ void setup(){
   pinMode(inA2, OUTPUT);
   pinMode(inB2, OUTPUT);
   pinMode(M1PWM, OUTPUT);
-  pinMode(M2PWM, OUTPUT);  
+  pinMode(M2PWM, OUTPUT); 
+ 
+  Wire.begin(sdaIndex); 
+  
   Wire.onReceive(receiveEvent); 
   
 }
@@ -63,6 +66,7 @@ void receiveEvent(int howMany){
   int i=0;
   while(Wire.available()){
     int c = Wire.read();
+    Serial.println(c);
     serInByte[i] = c;
     i++;
   }
