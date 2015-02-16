@@ -43,7 +43,7 @@ void stepperMotor(){
 }
 
 void motors(){
-    int m1Speed, m2Speed, m1Dir, m2Dir;
+    char m1Speed, m2Speed, m1Dir, m2Dir;
     cout<<"Input Motor1 Data:\nSpeed:";
     cin>>m1Speed;
     cout<<"Direction:";
@@ -69,6 +69,9 @@ void open(){
     ardu.Open(PORT);
     ardu.SetBaudRate(SerialStreamBuf::BAUD_9600);
     ardu.SetCharSize(SerialStreamBuf::CHAR_SIZE_8);
+    for(int i=0; i<BUFFER_SIZE; i++){
+        inBuffer[i] = 0;
+    }
 }
 
 void visionTest(){
