@@ -1,22 +1,36 @@
 #include <Wire.h>
 
 int ledPin = 13;
+const int sdaMotorIndex = 8;
+const int SDA_Pin = 2;
+const int SCL_Pin = 3;
+
+int serInByte[4];
 
 void setup() {
   Serial.begin(9600);
+  Wire.begin(sdaMotorIndex);
+  //pinMode(SDA_Pin, INPUT);
+  //pinMode(SCL_Pin, INPUT);
   pinMode(ledPin, OUTPUT);
+  
 }
-
 
 void loop(){
   if (Serial.available()>0){
-    int serInByte = Serial.read();
-    if (1) {
-      digitalWrite(ledPin, HIGH);
-      delay(1000*serInByte);
-      digitalWrite(ledPin,LOW);
-      delay(1000);
+    for(int i=0; i<4; i++){
+      char tmpC = Serial.read();
+      // serInByte[0] == motor1Speed
+      // serInByte[1] == motor1Dir
+      // serInByte[2] == motor2Speed
+      // serinByte[3] == motor2Dir
+      serInByte[i] = tmpC - '0';  
     } 
+    Wire.beginTransmission(sdaMotorIndex);
+    for(int i=0; i<4; i++){
+      Serial.println(serInByte[i]);
+      Wire.write(serInByte[i]);
+    }
   }
 }
 

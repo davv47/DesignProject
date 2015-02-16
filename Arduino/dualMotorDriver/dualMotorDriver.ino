@@ -50,22 +50,23 @@ void setup(){
   pinMode(inA2, OUTPUT);
   pinMode(inB2, OUTPUT);
   pinMode(M1PWM, OUTPUT);
-  pinMode(M2PWM, OUTPUT);
+  pinMode(M2PWM, OUTPUT);  
+  Wire.onReceive(receiveEvent); 
   
 }
 
 void loop(){
-  if (Serial.available()>0){
-    for(int i=0; i<4; i++){
-      char tmpC = Serial.read();
-      // serInByte[0] == motor1Speed
-      // serInByte[1] == motor1Dir
-      // serInByte[2] == motor2Speed
-      // serinByte[3] == motor2Dir
-      serInByte[i] = tmpC - '0';  
-    } 
-    moveMotors();
+  delay(1);
+}
+
+void receiveEvent(int howMany){
+  int i=0;
+  while(Wire.available()){
+    int c = Wire.read();
+    serInByte[i] = c;
+    i++;
   }
+  moveMotors();
 }
 
 void moveMotors(){
