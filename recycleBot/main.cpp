@@ -7,7 +7,7 @@
 #include <geometry.h>
 
 #include <SerialStream.h>
-#define PORT "/dev/ttyUSB0" //Arduinio Device
+#define PORT "/dev/ttyACM0" //Arduinio Device
 
 using namespace std;
 using namespace LibSerial;
