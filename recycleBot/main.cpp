@@ -24,19 +24,61 @@ void stepperMotor();
 void serialTest();
 void visionTest();
 void motors();
+void followObject();
 
 int main(){
     open();
-    motors();
+    //motors();
+    followObject();
 }
 
 void followObject(){
     //Get centroid of object
+    Mat imgOrig, imgHSV, imgOut;
+    int LHue, HHue, LSat, HSat, LVal, HVal;
+    VideoCapture cap(0); //capture the video from web cam
+
+    if (!cap.isOpened()){
+         cout << "Cannot open the web cam" << endl;
+    }
+
+    //Get Object to detect
+    cap.read(imgOrig);
+    objRecongition objRec;
+    objRec.getColour(imgOrig, LHue, HHue, LSat, HSat, LVal, HVal);
+    cout<<LHue<<endl;
+
+    while (true){
+        cap.read(imgOrig); //get video frame
+        //imshow("Original Image", imgOrig);
+        cvtColor(imgOrig, imgHSV, COLOR_BGR2HSV); //BGR to HSV
+        inRange(imgHSV, Scalar(LHue, LSat, LVal), Scalar(HHue, HSat, HVal), imgOut);
+        blur(imgOut, imgOut, Size(3,3));
+        //imshow("inRange", imgOut);
+        morphology objMor;
+        geometry objGeo;
+        Mat SE = getStructuringElement(MORPH_ELLIPSE, Size(6, 6)); //Set structuing element to be a 5x5 circle
+        imgOut = objMor.clo(imgOut,SE);
+        //imshow("mor", imgOut);
+        Point objectPT = objGeo.centre(imgOut);
+        //objRec.showCentre(imgOrig, objectPT);
+        //objRec.getBound(imgOut, imgOrig);
+
+        //imshow("Output Image", imgOut);
+        imshow("Bound and Centre", imgOrig);
+        if (waitKey(30) == 27){ //wait for 'esc' key press for 30ms. If 'esc' key is pressed, break loop
+            cout << "esc key is pressed by user" << endl;
+            break;
+        }
+        int x = objectPT.x;
+        cout<<x<<endl;
+
+        //Move Motors
 
 
-    //Move Motors
 
-   //Delay to account for small move
+        //Delay to account for small move
+    }
 }
 
 void serialTest(){
