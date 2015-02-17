@@ -5,7 +5,7 @@ const int sdaMotorIndex = 8;
 const int SDA_Pin = 2;
 const int SCL_Pin = 3;
 
-byte serInByte[4];
+int serInByte[4];
 
 void setup() {
   Serial.begin(9600);
@@ -18,13 +18,15 @@ void setup() {
 
 void loop(){
   if (Serial.available()>0){
-    for(int i=0; i<4; i++){
+    int i=0;
+    while(Serial.available()>0){
       char tmpC = Serial.read();
       // serInByte[0] == motor1Speed
       // serInByte[1] == motor1Dir
       // serInByte[2] == motor2Speed
       // serinByte[3] == motor2Dir
-      serInByte[i] = tmpC - '0';  
+      serInByte[i] = tmpC - '0'; 
+      i++;     
     } 
     Wire.beginTransmission(sdaMotorIndex);
     for(int i=0; i<4; i++){

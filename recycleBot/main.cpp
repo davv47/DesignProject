@@ -7,7 +7,7 @@
 #include <geometry.h>
 
 #include <SerialStream.h>
-#define PORT "/dev/ttyACM0" //Arduinio Device
+#define PORT "/dev/ttyUSB0" //Arduinio Device
 
 using namespace std;
 using namespace LibSerial;
@@ -67,9 +67,12 @@ void motors(){
     inBuffer[2] = m2Speed;
     inBuffer[3] = m2Dir;
 
+
     for (int i = 0; i<4; i++){
         ardu << inBuffer[i];
     }
+
+    //ardu.write(inBuffer, BUFFER_SIZE);
 
 }
 
@@ -78,9 +81,6 @@ void open(){
     ardu.Open(PORT);
     ardu.SetBaudRate(SerialStreamBuf::BAUD_9600);
     ardu.SetCharSize(SerialStreamBuf::CHAR_SIZE_8);
-    for(int i=0; i<BUFFER_SIZE; i++){
-        inBuffer[i] = 0;
-    }
 }
 
 void visionTest(){
