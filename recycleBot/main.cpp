@@ -30,6 +30,15 @@ int main(){
     motors();
 }
 
+void followObject(){
+    //Get centroid of object
+
+
+    //Move Motors
+
+   //Delay to account for small move
+}
+
 void serialTest(){
     open();
     stepperMotor();
@@ -43,7 +52,7 @@ void stepperMotor(){
 }
 
 void motors(){
-    int m1Speed, m2Speed, m1Dir, m2Dir;
+    char m1Speed, m2Speed, m1Dir, m2Dir;
     cout<<"Input Motor1 Data:\nSpeed:";
     cin>>m1Speed;
     cout<<"Direction:";
@@ -58,9 +67,12 @@ void motors(){
     inBuffer[2] = m2Speed;
     inBuffer[3] = m2Dir;
 
+
     for (int i = 0; i<4; i++){
         ardu << inBuffer[i];
     }
+
+    //ardu.write(inBuffer, BUFFER_SIZE);
 
 }
 

@@ -21,13 +21,13 @@ int sdaIndex = 8;
 
 const int inA1 = 4;
 const int inB1 = 5;
-const int M1PWM = A0;
-const int cs1 = 6;
+const int M1PWM = 6;
+const int cs1 = A1;
 
 const int inA2 = 8;
 const int inB2 = 7;
-const int M2PWM = A1;
-const int cs2 = 9;
+const int M2PWM = 9;
+const int cs2 = A0;
 
 const int speedMax = 255;
 
@@ -36,49 +36,65 @@ int lowVal = 0;
 int M1Speed, M2Speed, speedAdjust;
 int inA1Val, inB1Val, inA2Val, inB2Val;
 
-int currentPin = A0;
-int currentVal;
+int serInByte[4];
+
+//int currentPin = A0;
+//int currentVal;
 
 void setup(){
   Serial.begin(9600);
-  speedAdjust = 1;
-  // Set Inital Direction
-  inA1Val = highVal;
-  inB1Val = lowVal;
-  inA2Val = lowVal;
-  inB2Val = highVal;
-  //Write Motor Speeds to motors
-  analogWrite(inA1, inA1Val);
-  analogWrite(inB1, inB1Val);  
-  analogWrite(inA2, inA2Val);
-  analogWrite(inB2, inB2Val);
+  
+  //Write Motor Speeds to motors  
+  pinMode(inA1, OUTPUT);
+  pinMode(inB1, OUTPUT);
+  pinMode(inA2, OUTPUT);
+  pinMode(inB2, OUTPUT);
+  pinMode(M1PWM, OUTPUT);
+  pinMode(M2PWM, OUTPUT); 
+ 
+  Wire.begin(sdaIndex); 
+  
+  Wire.onReceive(receiveEvent); 
+  
 }
 
 void loop(){
-  if (M1Speed >= speedMax){
-    speedAdjust = -1;
+  delay(1);
+}
+
+void receiveEvent(int howMany){
+  int i=0;
+  while(Wire.available()){
+    int c = Wire.read();
+    Serial.println(c);
+    serInByte[i] = c;
+    i++;
   }
-  
-  if (M1Speed <= speedMax*.05){
-    speedAdjust = 1;
-    // Change Direction
-    if (inA1Val == highVal){
+  moveMotors();
+}
+
+void moveMotors(){
+
+    M1Speed = serInByte[0]*255/10;
+    M2Speed = serInByte[2]*255/10;
+    
+    if(serInByte[1] == 0){
       inA1Val = lowVal;
       inB1Val = highVal;
-      inA2Val = highVal;
-      inB2Val = lowVal;
     }
     else{
       inA1Val = highVal;
       inB1Val = lowVal;
+    }
+    if(serInByte[3] == 0){
       inA2Val = lowVal;
       inB2Val = highVal;
     }
-  }  
-  
-  // change speed
-  M1Speed += speedAdjust;
-  M2Speed += speedAdjust;
+    else{
+      inA2Val = highVal;
+      inB2Val = lowVal;
+    }
+    
   //Write Motor Speeds to motors
   analogWrite(inA1, inA1Val);
   analogWrite(inB1, inB1Val);  
@@ -87,21 +103,21 @@ void loop(){
   // output pwm to move wheel
   analogWrite(M1PWM, M1Speed);
   analogWrite(M2PWM, M2Speed); 
-  
+  Serial.println(M1Speed);
   
   // Read current
-  currentVal = analogRead(currentPin);
-  Serial.print("M1 speed =");
-  Serial.print(M1Speed);
-  Serial.print("\t M2 speed =");
-  Serial.print(M2Speed);
-  Serial.print("\t Current = ");
-  Serial.println(currentVal);
-  
-  delay(10);
-  
+  /*
+  if(0){
+    currentVal = analogRead(currentPin);
+    Serial.print("M1 speed =");
+    Serial.print(M1Speed);
+    Serial.print("\t M2 speed =");
+    Serial.print(M2Speed);
+    Serial.print("\t Current = ");
+    Serial.println(currentVal);
+  }
+  */
 }
-
 
 
   
