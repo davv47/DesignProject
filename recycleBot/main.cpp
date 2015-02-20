@@ -25,6 +25,7 @@ void serialTest();
 void visionTest();
 void motors();
 void followObject();
+void waitForSlow(int);
 
 int main(){
     open();
@@ -36,7 +37,8 @@ void followObject(){
     //Get centroid of object
     Mat imgOrig, imgHSV, imgOut;
     int LHue, HHue, LSat, HSat, LVal, HVal;
-    VideoCapture cap(0); //capture the video from web cam
+    char m1Speed, m2Speed, m1Dir, m2Dir;
+    VideoCapture cap(1); //capture the video from web cam
 
     if (!cap.isOpened()){
          cout << "Cannot open the web cam" << endl;
@@ -61,24 +63,85 @@ void followObject(){
         imgOut = objMor.clo(imgOut,SE);
         //imshow("mor", imgOut);
         Point objectPT = objGeo.centre(imgOut);
-        //objRec.showCentre(imgOrig, objectPT);
-        //objRec.getBound(imgOut, imgOrig);
+        objRec.showCentre(imgOrig, objectPT);
+        objRec.getBound(imgOut, imgOrig);
 
         //imshow("Output Image", imgOut);
         imshow("Bound and Centre", imgOrig);
-        if (waitKey(30) == 27){ //wait for 'esc' key press for 30ms. If 'esc' key is pressed, break loop
-            cout << "esc key is pressed by user" << endl;
-            break;
-        }
+
         int x = objectPT.x;
-        cout<<x<<endl;
+        if (x<0){
+            x = 319;
+        }
+        x = x-319;
 
         //Move Motors
+        //If approximately in middle then do not move motors
+        if (abs(x) < 50){
+            x = 0;
+            m1Speed = '0';
+            m2Speed = '0';
+        }
+        // Otherwise move motors at half speed
+        else{
+            m1Speed = '5';
+            m2Speed = '5';
+        }
+
+        // If in left of frame move motors Dir 1
+        if(x>0){
+            if (m1Dir == '0'){
+                waitForSlow(1000);
+            }
+            m1Dir = '1';
+            m2Dir = '0';
+        }
+        else{
+            if (m1Dir == '1'){
+                waitForSlow(1000);
+            }
+            m1Dir = '0';
+            m2Dir = '1';
+        }
+
+        //Send Signal to motors
+        inBuffer[0] = m1Speed;
+        inBuffer[1] = m1Dir;
+        inBuffer[2] = m2Speed;
+        inBuffer[3] = m2Dir;
 
 
+        for (int i = 0; i<4; i++){
+            ardu << inBuffer[i];
+        }
 
         //Delay to account for small move
+        waitKey(100);
+
+        // Output x
+        cout<<x<<endl;
     }
+}
+
+void waitForSlow(int waitTime){
+    char m1Speed, m2Speed, m1Dir, m2Dir;
+    m1Speed = '0';
+    m2Speed = '0';
+    m1Dir = '0';
+    m2Dir = '0';
+    //Send Signal to motors
+    inBuffer[0] = m1Speed;
+    inBuffer[1] = m1Dir;
+    inBuffer[2] = m2Speed;
+    inBuffer[3] = m2Dir;
+
+
+    for (int i = 0; i<4; i++){
+        ardu << inBuffer[i];
+    }
+
+    waitKey(waitTime);
+
 }
 
 void serialTest(){
