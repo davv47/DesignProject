@@ -26,14 +26,21 @@ void loop(){
       // serInByte[2] == motor2Speed
       // serinByte[3] == motor2Dir
       serInByte[i] = tmpC - '0'; 
+      Serial.print(serInByte[i]);
       i++;     
-    } 
-    Wire.beginTransmission(sdaMotorIndex);
-    for(int i=0; i<4; i++){
-      Serial.println(serInByte[i]);
-      Wire.write(serInByte[i]);
+    }    
+    Serial.println();
+    if (i == 4){
+      Wire.beginTransmission(sdaMotorIndex);
+      for(int i=0; i<4; i++){
+        Wire.write(serInByte[i]);
+      }
+      Wire.endTransmission();
     }
-    Wire.endTransmission();
+    else{
+      Serial.println("E");
+    }
   }
+  delay(1);
 }
 

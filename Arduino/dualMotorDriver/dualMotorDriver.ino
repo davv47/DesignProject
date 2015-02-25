@@ -20,14 +20,14 @@ Code to recieve I2C and move motor accordingly
 int sdaIndex = 8;
 
 const int inA1 = 4;
-const int inB1 = 5;
-const int M1PWM = 6;
-const int cs1 = A1;
+const int inB1 = 3;
+const int M1PWM = 10;
+const int cs1 = A3;
 
-const int inA2 = 8;
-const int inB2 = 7;
-const int M2PWM = 9;
-const int cs2 = A0;
+const int inA2 = 5;
+const int inB2 = 2;
+const int M2PWM = 11;
+const int cs2 = A2;
 
 const int speedMax = 255;
 

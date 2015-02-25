@@ -15,7 +15,7 @@ using namespace cv;
 
 // Global Declorations of Serial Information
 SerialStream ardu;
-const int BUFFER_SIZE = 1;
+const int BUFFER_SIZE = 4;
 char inBuffer[BUFFER_SIZE];
 
 
@@ -26,11 +26,17 @@ void visionTest();
 void motors();
 void followObject();
 void waitForSlow(int);
+void tmp();
 
 int main(){
-    open();
-    //motors();
-    followObject();
+    waitKey(10000);
+    //followObject();
+    tmp();
+}
+
+void tmp(){
+     objRecongition objRec;
+     objRec.getColourRange();
 }
 
 void followObject(){
@@ -38,7 +44,9 @@ void followObject(){
     Mat imgOrig, imgHSV, imgOut;
     int LHue, HHue, LSat, HSat, LVal, HVal;
     char m1Speed, m2Speed, m1Dir, m2Dir;
-    VideoCapture cap(1); //capture the video from web cam
+    int webCamNum = 1;
+
+    VideoCapture cap(webCamNum); //capture the video from web cam
 
     if (!cap.isOpened()){
          cout << "Cannot open the web cam" << endl;
@@ -64,12 +72,14 @@ void followObject(){
         //imshow("mor", imgOut);
         Point objectPT = objGeo.centre(imgOut);
         objRec.showCentre(imgOrig, objectPT);
-        objRec.getBound(imgOut, imgOrig);
+        objRec.getBound2(imgOut, imgOrig);
 
         //imshow("Output Image", imgOut);
         imshow("Bound and Centre", imgOrig);
 
         int x = objectPT.x;
+
+        //If no object in frame treat object as in centre of window
         if (x<0){
             x = 319;
         }
@@ -94,14 +104,14 @@ void followObject(){
                 waitForSlow(1000);
             }
             m1Dir = '1';
-            m2Dir = '0';
+            m2Dir = '1';
         }
         else{
             if (m1Dir == '1'){
                 waitForSlow(1000);
             }
             m1Dir = '0';
-            m2Dir = '1';
+            m2Dir = '0';
         }
 
         //Send Signal to motors
@@ -110,13 +120,18 @@ void followObject(){
         inBuffer[2] = m2Speed;
         inBuffer[3] = m2Dir;
 
-
-        for (int i = 0; i<4; i++){
+        //Open Serial Port
+        open();
+        //Send data
+        /*for (int i = 0; i<4; i++){
             ardu << inBuffer[i];
-        }
+        }*/
+        ardu.write(inBuffer, BUFFER_SIZE);
+        //close Serial Port
+        ardu.Close();
 
         //Delay to account for small move
-        waitKey(100);
+        waitKey(10);
 
         // Output x
         cout<<x<<endl;
@@ -136,9 +151,7 @@ void waitForSlow(int waitTime){
     inBuffer[3] = m2Dir;
 
 
-    for (int i = 0; i<4; i++){
-        ardu << inBuffer[i];
-    }
+
 
     waitKey(waitTime);
 
@@ -172,10 +185,11 @@ void motors(){
     inBuffer[2] = m2Speed;
     inBuffer[3] = m2Dir;
 
+    open();
+    ardu.write(inBuffer, BUFFER_SIZE);
+    //close Serial Port
+    ardu.Close();
 
-    for (int i = 0; i<4; i++){
-        ardu << inBuffer[i];
-    }
 
     //ardu.write(inBuffer, BUFFER_SIZE);
 
