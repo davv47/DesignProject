@@ -44,7 +44,7 @@ void followObject(){
     Mat imgOrig, imgHSV, imgOut;
     int LHue, HHue, LSat, HSat, LVal, HVal;
     char m1Speed, m2Speed, m1Dir, m2Dir;
-    int webCamNum = 1;
+    int webCamNum = 0;
 
     VideoCapture cap(webCamNum); //capture the video from web cam
 
@@ -94,8 +94,8 @@ void followObject(){
         }
         // Otherwise move motors at half speed
         else{
-            m1Speed = '5';
-            m2Speed = '5';
+            m1Speed = '2';
+            m2Speed = '1';
         }
 
         // If in left of frame move motors Dir 1
