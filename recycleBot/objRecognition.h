@@ -114,7 +114,7 @@ void objRecongition::showCentre(Mat &imgOut, Point objectPT){
 }
 
 void objRecongition::getColorRange(Mat &imgOut){
-    namedWindow("Control", CV_WINDOW_AUTOSIZE); //create a window called "Control"
+    /*namedWindow("Control", CV_WINDOW_AUTOSIZE); //create a window called "Control"
 
        int iLowH = 0;
        int iHighH = 179;
@@ -171,7 +171,7 @@ void objRecongition::getColorRange(Mat &imgOut){
                   cout << "esc key is pressed by user" << endl;
                   break;
              }
-          }
+          }*/
   }
 
 

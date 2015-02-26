@@ -30,13 +30,13 @@ void tmp();
 
 int main(){
     waitKey(10000);
-    //followObject();
-    tmp();
+    followObject();
+    //tmp();
 }
 
 void tmp(){
      objRecongition objRec;
-     objRec.getColourRange();
+     //objRec.getColourRange();
 }
 
 void followObject(){
