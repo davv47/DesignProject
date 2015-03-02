@@ -314,6 +314,8 @@ main.o: ../recycleBot/main.cpp /../../../usr/local/include/opencv2/highgui/highg
 		../recycleBot/morphology.h \
 		../recycleBot/objRecognition.h \
 		../recycleBot/geometry.h \
+		../recycleBot/objectfollow.h \
+		../recycleBot/serialCom.h \
 		/../../../usr/local/include/SerialStream.h \
 		/../../../usr/local/include/SerialStreamBuf.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o main.o ../recycleBot/main.cpp

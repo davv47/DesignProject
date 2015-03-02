@@ -22,9 +22,11 @@ class objFollow{
     public:
     void followObj();
     void waitForSlow(int);
-    void followLine(int);
+    void moveLine(int, char&, char&, char&, char&);
 };
-
+/*followObj********************************************************************
+ *Function for Robot to follow red object
+ * ***************************************************************************/
 void objFollow::followObj(){
     //Get centroid of object
     Mat imgOrig, imgHSV, imgOut;
@@ -33,6 +35,7 @@ void objFollow::followObj(){
     int webCamNum = 1;
 
     serialCom ser;
+    objFollow objFol;
 
     VideoCapture cap(webCamNum); //capture the video from web cam
 
@@ -78,27 +81,26 @@ void objFollow::followObj(){
         //Move Motors
         //If approximately in middle then move in straight line
         if (abs(x) < 50){
-
+           moveLine(area, m1Speed, m2Speed, m1Dir, m2Dir);
             x = 0;
-            m1Speed = '0';
-            m2Speed = '0';
         }
+
         // Otherwise move motors at half speed
         else{
-            m1Speed = '5';
-            m2Speed = '5';
+            m1Speed = '1';
+            m2Speed = '1';
         }
 
         // If in left of frame move motors Dir 1
         if(x>0){
-            if (m1Dir == '0'){
+            if (m1Dir == '0' && m2Dir == '0'){
                 waitForSlow(1000);
             }
             m1Dir = '1';
             m2Dir = '1';
         }
         else{
-            if (m1Dir == '1'){
+            if (m1Dir == '1' && m2Dir == '1'){
                 waitForSlow(1000);
             }
             m1Dir = '0';
@@ -113,10 +115,8 @@ void objFollow::followObj(){
 
         //Open Serial Port
         ser.open();
+
         //Send data
-        /*for (int i = 0; i<4; i++){
-            ardu << inBuffer[i];
-        }*/
         ardu.write(inBuffer, BUFFER_SIZE);
         //close Serial Port
         ardu.Close();
@@ -125,10 +125,12 @@ void objFollow::followObj(){
         waitKey(10);
 
         // Output x
-        cout<<x<<endl;
+        cout<<"x is: "<<x<<" Area is: "<<area<<endl;
     }
 }
-
+/*waitForSlow********************************************************************
+ * Delay changing directions (do not blow motors)
+ * ***************************************************************************/
 void objFollow::waitForSlow(int waitTime){
     char m1Speed, m2Speed, m1Dir, m2Dir;
     m1Speed = '0';
@@ -146,14 +148,35 @@ void objFollow::waitForSlow(int waitTime){
 
 /*moveLine********************************************************************
  * Move object forward or backword based on its size
+ * Input:
+ *      a - area of object in image
+ * Modifies:
+ *      -Motor Speeds
+ *      -Motor Directions
  * ***************************************************************************/
-void objFollow::moveLine(int a){
-    int sizeThresh = 50;//??
+void objFollow::moveLine(int a, char& m1Speed, char& m2Speed, char& m1Dir, char& m2Dir){
+    int sizeThresh = 25000;
+    int deadZone = 10000;
     if (a < (sizeThresh-deadZone)){
-        //Move Foreward
+        m1Dir = '0';
+        m2Dir = '1';
+        m1Speed = '1';
+        m2Speed = '1';
+        cout<<"Going foreward"<<endl;
     }
-    else if( a > (sizeThresh+deadZone)){
-        //Move backwards
+    else if(a > (sizeThresh+deadZone)){
+        m1Dir = '1';
+        m2Dir = '0';
+        m1Speed = '1';
+        m2Speed = '1';
+        cout<<"Going backward"<<endl;
+    }
+    else{
+        m1Dir = '0';
+        m2Dir = '0';
+        m1Speed = '0';
+        m2Speed = '0';
+        cout<<"Stopped"<<endl;
     }
 }
 
