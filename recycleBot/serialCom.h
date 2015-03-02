@@ -8,15 +8,22 @@
 using namespace std;
 using namespace LibSerial;
 
+const int BUFFER_SIZE = 4;
+char inBuffer[BUFFER_SIZE];
+SerialStream ardu;
+
 class serialCom{
     public:
         // Global Declorations of Serial Information
-        SerialStream ardu;
-        const int BUFFER_SIZE = 1;
-        char inBuffer[BUFFER_SIZE];
-
+        void open();
 };
 
+void serialCom::open(){
+    /*The arduino must be setup to use the same baud rate*/
+    ardu.Open(PORT);
+    ardu.SetBaudRate(SerialStreamBuf::BAUD_9600);
+    ardu.SetCharSize(SerialStreamBuf::CHAR_SIZE_8);
+}
 
 
 #endif // SERIALCOM_H
