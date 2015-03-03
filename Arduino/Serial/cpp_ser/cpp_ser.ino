@@ -2,6 +2,7 @@
 
 int ledPin = 13;
 const int sdaMotorIndex = 8;
+const int sdaLEDIndex = 9;
 const int SDA_Pin = 2;
 const int SCL_Pin = 3;
 
@@ -34,6 +35,14 @@ void loop(){
       Wire.beginTransmission(sdaMotorIndex);
       for(int i=0; i<4; i++){
         Wire.write(serInByte[i]);
+      }
+      Wire.endTransmission();
+      Wire.beginTransmission(sdaLEDIndex);
+      if (serInByte[0] == 0){
+        Wire.write(0)
+      }
+      else{
+        Wire.write(1);
       }
       Wire.endTransmission();
     }

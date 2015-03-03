@@ -52,8 +52,7 @@ void setup(){
   pinMode(M1PWM, OUTPUT);
   pinMode(M2PWM, OUTPUT); 
  
-  Wire.begin(sdaIndex); 
-  
+  Wire.begin(sdaIndex);   
   Wire.onReceive(receiveEvent); 
   
 }
