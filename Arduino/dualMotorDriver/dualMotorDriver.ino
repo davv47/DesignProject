@@ -17,7 +17,7 @@ Code to recieve I2C and move motor accordingly
 
 #include <Wire.h>
 
-int sdaIndex = 8;
+int sdaIndex = 9;
 
 const int inA1 = 4;
 const int inB1 = 3;

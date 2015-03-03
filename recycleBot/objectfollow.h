@@ -32,10 +32,9 @@ void objFollow::followObj(){
     Mat imgOrig, imgHSV, imgOut;
     int LHue, HHue, LSat, HSat, LVal, HVal;
     char m1Speed, m2Speed, m1Dir, m2Dir;
-    int webCamNum = 1;
+    int webCamNum = 0;
 
     serialCom ser;
-    objFollow objFol;
 
     VideoCapture cap(webCamNum); //capture the video from web cam
 
@@ -80,7 +79,7 @@ void objFollow::followObj(){
 
         //Move Motors
         //If approximately in middle then move in straight line
-        if (abs(x) < 50){
+        if (abs(x) < 100){
            moveLine(area, m1Speed, m2Speed, m1Dir, m2Dir);
             x = 0;
         }
@@ -115,7 +114,6 @@ void objFollow::followObj(){
 
         //Open Serial Port
         ser.open();
-
         //Send data
         ardu.write(inBuffer, BUFFER_SIZE);
         //close Serial Port

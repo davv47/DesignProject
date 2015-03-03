@@ -1,8 +1,8 @@
 #include <Wire.h>
 
 int ledPin = 13;
-const int sdaMotorIndex = 8;
-const int sdaLEDIndex = 9;
+const int sdaMotorIndex = 9;
+const int sdaLEDIndex = 8;
 const int SDA_Pin = 2;
 const int SCL_Pin = 3;
 
@@ -11,6 +11,7 @@ int serInByte[4];
 void setup() {
   Serial.begin(9600);
   Wire.begin(sdaMotorIndex);
+  Wire.begin(sdaLEDIndex);
   //pinMode(SDA_Pin, INPUT);
   //pinMode(SCL_Pin, INPUT);
   pinMode(ledPin, OUTPUT);
@@ -32,18 +33,21 @@ void loop(){
     }    
     Serial.println();
     if (i == 4){
-      Wire.beginTransmission(sdaMotorIndex);
+      /*Wire.beginTransmission(sdaMotorIndex);
       for(int i=0; i<4; i++){
         Wire.write(serInByte[i]);
       }
-      Wire.endTransmission();
+      Wire.endTransmission();*/
       Wire.beginTransmission(sdaLEDIndex);
+      int ledVal;
       if (serInByte[0] == 0){
-        Wire.write(0);
+       ledVal = 0;
       }
       else{
-        Wire.write(1);
+        ledVal = 1;
       }
+      Wire.write(ledVal);
+      Serial.println(ledVal);
       Wire.endTransmission();
     }
     else{

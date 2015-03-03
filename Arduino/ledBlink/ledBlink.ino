@@ -6,10 +6,11 @@
 
 int sdaIndex = 8;
 int ledPin = 13;
+int serInByte[4];
 
-void setup() {     
+void setup() {
+  Serial.begin(9600);
   pinMode(ledPin, OUTPUT);
-  
   Wire.begin(sdaIndex);   
   Wire.onReceive(receiveEvent); 
     
@@ -19,13 +20,15 @@ void loop() {
 }
 
 void receiveEvent(int howMany){
+  Serial.println("got msg: ");
   int i=0;
-  int c;
   while(Wire.available()){
-    c = Wire.read();
+    serInByte[i] = Wire.read();
+    i++;
   }
   // If motor not moving set pin to high to turn off LED
-  if (c == 0){
+  Serial.println(serInByte[0]);
+  if (serInByte[0] == 0){
     digitalWrite(ledPin, HIGH);
   }
   // Otherwise turn on light
