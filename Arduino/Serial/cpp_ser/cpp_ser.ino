@@ -39,7 +39,7 @@ void loop(){
       Wire.endTransmission();
       Wire.beginTransmission(sdaLEDIndex);
       if (serInByte[0] == 0){
-        Wire.write(0)
+        Wire.write(0);
       }
       else{
         Wire.write(1);
