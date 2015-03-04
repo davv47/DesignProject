@@ -31,7 +31,7 @@ void loop(){
       Serial.print(serInByte[i]);
       i++;     
     }    
-    Serial.println();
+    //Serial.println();
     if (i == 4){
       /*Wire.beginTransmission(sdaMotorIndex);
       for(int i=0; i<4; i++){
@@ -47,7 +47,6 @@ void loop(){
         ledVal = 1;
       }
       Wire.write(ledVal);
-      Serial.println(ledVal);
       Wire.endTransmission();
     }
     else{

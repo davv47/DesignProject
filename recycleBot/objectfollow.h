@@ -32,7 +32,7 @@ void objFollow::followObj(){
     Mat imgOrig, imgHSV, imgOut;
     int LHue, HHue, LSat, HSat, LVal, HVal;
     char m1Speed, m2Speed, m1Dir, m2Dir;
-    int webCamNum = 0;
+    int webCamNum = 1;
 
     serialCom ser;
 

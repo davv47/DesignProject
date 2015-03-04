@@ -9,7 +9,6 @@
 
 #include <SerialStream.h>
 #define PORT "/dev/ttyACM0" //Arduinio Device
-
 using namespace std;
 using namespace LibSerial;
 using namespace cv;
