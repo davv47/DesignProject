@@ -19,10 +19,8 @@ serialCom ser;
 // Global Declorations of Serial Information
 
 int main(){
+    string colour = "red";
     waitKey(10000);
     objFollow follow;
-    follow.followObj();
+    follow.followObj(colour);
 }
-
-
-
