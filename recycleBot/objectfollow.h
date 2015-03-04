@@ -33,6 +33,7 @@ void objFollow::followObj(){
     int LHue, HHue, LSat, HSat, LVal, HVal;
     char m1Speed, m2Speed, m1Dir, m2Dir;
     int webCamNum = 1;
+    char dir, lastDir;
 
     serialCom ser;
 
@@ -80,15 +81,21 @@ void objFollow::followObj(){
         //Move Motors
         //If approximately in middle then move in straight line
         if (abs(x) < 100){
+            dir = 'L';
            moveLine(area, m1Speed, m2Speed, m1Dir, m2Dir);
             x = 0;
         }
 
         // Otherwise move motors at half speed
         else{
+            dir = 'T';
             m1Speed = '1';
             m2Speed = '1';
         }
+        if (dir != lastDir){
+            waitForSlow(500);
+        }
+
 
         // If in left of frame move motors Dir 1
         if(x>0){
@@ -98,7 +105,7 @@ void objFollow::followObj(){
             m1Dir = '1';
             m2Dir = '1';
         }
-        else{
+        else if (x<0){
             if (m1Dir == '1' && m2Dir == '1'){
                 waitForSlow(1000);
             }
@@ -124,6 +131,7 @@ void objFollow::followObj(){
 
         // Output x
         cout<<"x is: "<<x<<" Area is: "<<area<<endl;
+        lastDir = dir;
     }
 }
 /*waitForSlow********************************************************************

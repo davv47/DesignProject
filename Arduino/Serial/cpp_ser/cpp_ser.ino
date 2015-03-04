@@ -33,11 +33,11 @@ void loop(){
     }    
     //Serial.println();
     if (i == 4){
-      /*Wire.beginTransmission(sdaMotorIndex);
+      Wire.beginTransmission(sdaMotorIndex);
       for(int i=0; i<4; i++){
         Wire.write(serInByte[i]);
       }
-      Wire.endTransmission();*/
+      Wire.endTransmission();
       Wire.beginTransmission(sdaLEDIndex);
       int ledVal;
       if (serInByte[0] == 0){

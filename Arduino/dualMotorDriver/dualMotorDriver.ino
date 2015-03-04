@@ -74,8 +74,8 @@ void receiveEvent(int howMany){
 
 void moveMotors(){
 
-    M1Speed = serInByte[0]*255/10;
-    M2Speed = serInByte[2]*255/10;
+    M1Speed = serInByte[0]*255/10*.8;
+    M2Speed = serInByte[2]*255/10*.7;
     
     if(serInByte[1] == 0){
       inA1Val = lowVal;
