@@ -24,3 +24,4 @@ int main(){
     objFollow follow;
     follow.followObj(colour);
 }
+

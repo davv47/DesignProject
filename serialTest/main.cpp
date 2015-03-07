@@ -15,7 +15,12 @@ void stepperMotor();
 
 int main(){
     open();
-    stepperMotor();
+    char status[4];
+    for (int i = 0; i < 4; i++){
+        ardu >> status[i];
+    }
+    string str = string(status);
+    cout<<str;
 }
 
 void stepperMotor(){

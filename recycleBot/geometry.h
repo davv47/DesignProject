@@ -21,16 +21,25 @@ class geometry{
 
         Mat rot(Mat, int);
         Mat crop(Mat, int, int);
+        Mat cropPt(Mat, int, int, Point);
         Point centre(Mat);
         double angle(Mat);
         int quad(Mat, Point);
         void showCentre(Mat&, Point);
         int size(Mat);
         void imFlip(Mat&, Mat&);
+        Point getCentreOfRect(Rect);
+
 };
 
-
-
+/*rot********************************************************************
+ *rotates an image a specified number of degrees
+ * Input:
+ *      -Input image (to be rotated)
+ *      -Angle of Rotation (in degrees)
+ * Returns:
+ *      -rotated Image
+ * ***************************************************************************/
 Mat geometry::rot(Mat INimg, int angle){
     int size = max(INimg.cols, INimg.rows);
     Point2f pt(size/2., size/2.);
@@ -42,6 +51,15 @@ Mat geometry::rot(Mat INimg, int angle){
     return _outIM;
 }
 
+/*Crop********************************************************************
+ *Cropps an image from the centre of the frame
+ * Input:
+ *      -Input image (to be cropped)
+ *      -newRows (y size of crop)
+ *      -newCols (x size of Crop)
+ * Returns:
+ *      -Cropped Image
+ * ***************************************************************************/
 Mat geometry::crop(Mat INimg, int newRows, int newCols){
     int origRows = INimg.rows;
     int origCols = INimg.cols;
@@ -53,6 +71,36 @@ Mat geometry::crop(Mat INimg, int newRows, int newCols){
     return _outIM;
 }
 
+
+//UNTESTED_____Should work but need to make sure
+/*CropPt********************************************************************
+ *Cropps an image from the Specified Point
+ * Input:
+ *      -INimg: Image to be cropped
+ *      -newRows: y size of crop
+ *      -newCols: x size of Crop
+ *      -pt: Point to crop around
+ * Returns:
+ *      -Cropped Image
+ * ***************************************************************************/
+Mat geometry::cropPt(Mat INimg, int newRows, int newCols, Point pt){
+    int origRows = INimg.rows;
+    int origCols = INimg.cols;
+    int x = (origRows - newRows)/2 + pt.x;
+    int y = (origCols - newCols)/2 + pt.y;
+    int h = newRows;
+    int w = newCols;
+    _outIM = INimg(Rect(x,y,h,w));
+    return _outIM;
+}
+
+/*Centre********************************************************************
+ *Cropps an image from the centre of the frame
+ * Input:
+ *      -INimg: Image to find centroid
+ * Returns:
+ *      -Point of centroid of object
+ * ***************************************************************************/
 Point geometry::centre(Mat INimg){
     Point pt;
     Mat TMPimg = INimg;
@@ -64,13 +112,26 @@ Point geometry::centre(Mat INimg){
 
 }
 
+/*size********************************************************************
+ *Gets Size of object in BWimage
+ * Input:
+ *      -INimg: Image to find centroid
+ * Returns:
+ *      -_size: size of the image
+ * ***************************************************************************/
 int geometry::size(Mat INimg){
     Moments mm = moments(INimg, true);
     _size = mm.m00;
     return _size;
 }
 
-//Returns angle between 0 and 180 degrees
+/*angle********************************************************************
+ *Gets Size of object in BWimage
+ * Input:
+ *      -INimg: Image to find centroid
+ * Returns:
+ *      -angle of the image (between 0 and 180 degrees)
+ * ***************************************************************************/
 double geometry::angle(Mat INimg){
     double theta;
     Mat TMPimg = INimg;
@@ -97,6 +158,13 @@ double geometry::angle(Mat INimg){
     return _angle;
 }
 
+/*quad********************************************************************
+ *Gets quadrant of object in BWimage
+ * Input:
+ *      -INimg: Image to find centroid
+ * Returns:
+ *      -quadrant number (1-4) of the centre of the object
+ * ***************************************************************************/
 int geometry::quad(Mat INimg, Point objPT){
     int quadNum;
     int centreRows = INimg.rows/2;
@@ -126,15 +194,48 @@ int geometry::quad(Mat INimg, Point objPT){
     return _quad;
 }
 
+/*imFlip********************************************************************
+ *Flipps the input image
+ * Input:
+ *      -INimg: Image to find centroid
+ * Modifies:
+ *      -OUTimg: flipped image
+ * ***************************************************************************/
 void geometry::imFlip(Mat &INimg, Mat& OUTimg){
     flip(INimg, OUTimg, 1);
 }
 
-
+/*showCentre********************************************************************
+ *Display point on plot
+ * Input:
+ *      -objectPT: Point to be displayed on the image
+ * Modifies:
+ *      -imgOut: image that will have point put into frame
+ * ***************************************************************************/
 void geometry::showCentre(Mat &imgOut, Point objectPT){
     int thickness = -1;
     int lineType = 8;
     circle (imgOut, objectPT, 20, Scalar(255,0,0), thickness, lineType);
+}
+
+/*getCentreOfRect********************************************************************
+ *Gets the centre point of an object from the parameters defined by the
+ *rectangle
+ * Input:
+ *      -rect: the rectangle object to find the centre point of
+ * Returns:
+ *      -The rectangle's centre point
+ * ***************************************************************************/
+Point geometry::getCentreOfRect(Rect rect){
+    Point pt;
+    int x, y, w, h;
+    x = rect.x;
+    y = rect.y;
+    w = rect.width;
+    h = rect.height;
+    pt.x = x + w/2;
+    pt.y = y + h/2;
+    return pt;
 }
 
 #endif // GEOMETRY_H

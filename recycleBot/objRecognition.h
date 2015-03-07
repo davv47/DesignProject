@@ -6,20 +6,28 @@
 #include <iostream>
 #include <string.h>
 #include <cmath>
+#include <geometry.h>
 
 using namespace std;
 using namespace cv;
 
 class objRecongition{
     public:
-    void getColour(Mat&, int&, int&, int&, int&, int&, int&, string);
+    void getColour(int&, int&, int&, int&, int&, int&, string);
     void getBound(Mat&, Mat&);
-    void getBound2(Mat&, Mat&);
+    void getBound2(Mat&, Mat&, Point&);
     void showCentre(Mat&, Point);
     void getColorRange();
 };
 
-void objRecongition::getColour(Mat &imgOrig, int &LHue, int &HHue, int &LSat, int &HSat, int &LVal, int &HVal, string colour){
+/*getColour********************************************************************
+ *returns the HSV values of the colour of the object selected
+ * Inputs:
+ *      -colour: the colour of the object
+ * Modifies:
+ *      -HSV values
+ * ***************************************************************************/
+void objRecongition::getColour(int &LHue, int &HHue, int &LSat, int &HSat, int &LVal, int &HVal, string colour){
     //Red       0   -   59
     //Yellow    60  -   119
     //Green     120 -   179
@@ -29,9 +37,9 @@ void objRecongition::getColour(Mat &imgOrig, int &LHue, int &HHue, int &LSat, in
 
     if(colour == "red"){
         LHue = 0;
-        HHue = 15;
+        HHue = 19;
 
-        LSat = 245;
+        LSat = 202;
         HSat = 255;
 
         LVal = 0;
@@ -39,6 +47,11 @@ void objRecongition::getColour(Mat &imgOrig, int &LHue, int &HHue, int &LSat, in
     }
 
 }
+
+/*getBound********************************************************************
+ *Shows all bounding boxes of all objects in frame that meet HSV
+ *requirements
+ * ***************************************************************************/
 void objRecongition::getBound(Mat &imgOut, Mat &imgOrig){
     vector <vector <Point> > contours;
     vector <Vec4i> hierarchy;
@@ -60,7 +73,10 @@ void objRecongition::getBound(Mat &imgOut, Mat &imgOrig){
 
 }
 
-void objRecongition::getBound2(Mat &imgOut, Mat &imgOrig){
+/*getBound2********************************************************************
+ *Shows bounds of largest object that meets HSV requirements
+ * ***************************************************************************/
+void objRecongition::getBound2(Mat &imgOut, Mat &imgOrig, Point& pt){
     vector <vector <Point> > contours;
     vector <Vec4i> hierarchy;
     RNG rng(12345);
@@ -72,11 +88,6 @@ void objRecongition::getBound2(Mat &imgOut, Mat &imgOrig){
     vector <vector <Point> >contours_poly(contours.size());
     vector<Rect> boundRect(contours.size() );
 
-
-    /*for( int i = 0; i < contours.size(); i++ ){
-        approxPolyDP(Mat(contours[i]), contours_poly[i], 3, true );
-        boundRect[i] = boundingRect(Mat(contours_poly[i]) );
-    }*/
     for( int i = 0; i< contours.size(); i++ ){
         double a =contourArea(contours[i]);
         if(a>largest_area){
@@ -84,17 +95,32 @@ void objRecongition::getBound2(Mat &imgOut, Mat &imgOrig){
                largest_contour_index=i;                //Store the index of largest contour
         }
         bounding_rect = boundingRect(contours[largest_contour_index]);
+
+        //Get centre of bounding rectangle
+        geometry geo;
+        pt = geo.getCentreOfRect(bounding_rect);
+
         Scalar color = Scalar(0, 0, 0);
         rectangle(imgOrig, bounding_rect, color, 2, 8, 0 );
     }
 }
 
+/*getColour********************************************************************
+ *Puts centre point on image passed to function
+ * Inputs:
+ *      -Point of object centroid
+ * Modifies:
+ *      -imgOut to show position of this object
+ * ***************************************************************************/
 void objRecongition::showCentre(Mat &imgOut, Point objectPT){
     int thickness = -1;
     int lineType = 8;
     circle (imgOut, objectPT, 5, Scalar(0,0,0), thickness, lineType);
 }
 
+/*getColorRange********************************************************************
+ *Function to play with colour values and see what is detected
+ * ***************************************************************************/
 void objRecongition::getColorRange(){
 
     VideoCapture cap(1); //capture the video from web cam

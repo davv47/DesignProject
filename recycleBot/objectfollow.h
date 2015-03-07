@@ -48,15 +48,16 @@ void objFollow::followObj(string colour){
     //Get Object to detect
     cap.read(imgOrig);
     objRecongition objRec;
-    objRec.getColour(imgOrig, LHue, HHue, LSat, HSat, LVal, HVal, colour);
+    objRec.getColour(LHue, HHue, LSat, HSat, LVal, HVal, colour);
     cout<<LHue<<endl;
 
-
+    //While program not stopped by user
     while (loop){
         cap.read(imgOrig); //get video frame
         //imshow("Original Image", imgOrig);
         morphology objMor;
         geometry objGeo;
+        Point objectPT;
         cvtColor(imgOrig, imgHSV, COLOR_BGR2HSV); //BGR to HSV
         inRange(imgHSV, Scalar(LHue, LSat, LVal), Scalar(HHue, HSat, HVal), imgOut);
         blur(imgOut, imgOut, Size(3,3));
@@ -65,9 +66,9 @@ void objFollow::followObj(string colour){
         imgOut = objMor.clo(imgOut,SE);
         int area = objGeo.size(imgOut);
         imshow("mor", imgOut);
-        Point objectPT = objGeo.centre(imgOut);
+        //Point objectPT = objGeo.centre(imgOut);
+        objRec.getBound2(imgOut, imgOrig, objectPT);
         objRec.showCentre(imgOrig, objectPT);
-        objRec.getBound2(imgOut, imgOrig);
 
         //imshow("Output Image", imgOut);
         imshow("Bound and Centre", imgOrig);
@@ -188,6 +189,9 @@ void objFollow::moveLine(int a, char& m1Speed, char& m2Speed, char& m1Dir, char&
     }
 }
 
+/*stopMovement********************************************************************
+ * Sets the motor speed of all motors to zero (for end of the program)
+ * ***************************************************************************/
 void objFollow::stopMovement(serialCom ser){
     char m1Speed, m2Speed, m1Dir, m2Dir;
     m1Speed = '0';
