@@ -68,7 +68,7 @@ void objFollow::followObj(string colour){
         cvtColor(imgOrig, imgHSV, COLOR_BGR2HSV); //BGR to HSV
         inRange(imgHSV, Scalar(LHue, LSat, LVal), Scalar(HHue, HSat, HVal), imgOut);
         blur(imgOut, imgOut, Size(3,3));
-        imshow("inRange", imgOut);
+        //imshow("inRange", imgOut);
         Mat SE = getStructuringElement(MORPH_ELLIPSE, Size(2, 2)); //Set structuing element to be a 5x5 circle
         imgOut = objMor.clo(imgOut,SE);
         int area = objGeo.size(imgOut);
@@ -188,10 +188,66 @@ void objFollow::waitForSlow(int waitTime, serialCom ser, bool& loop){
  *      -Motor Directions
  * ***************************************************************************/
 void objFollow::moveLine(int a, char& m1Speed, char& m2Speed, char& m1Dir, char& m2Dir, char& dir){
-    int sizeThresh = 10000;
-    int deadZone = 2000;
-    int sizeSlow = 500;
-    if (a < (sizeThresh-deadZone)){
+    char sizeRng;
+    int sizeThresh = 15000;
+    int deadZone = 2000/2;
+    int sizeSlow = 3000;
+    if (a>sizeSlow && a<(sizeThresh-deadZone)) sizeRng = 'S';
+    else if (a<sizeSlow) sizeRng = 'F';
+    else if (a>=(sizeThresh+deadZone)) sizeRng = 'B';
+    else sizeRng = 'P';
+    switch (sizeRng){
+    case 'F':
+        dir = 'F';
+        m1Dir = '0';
+        m2Dir = '1';
+        m1Speed = '1';
+        m2Speed = '1';
+        cout<<"Fast foreward"<<endl;
+        break;
+    case 'S':
+        dir = 'N';
+        m1Dir = '0';
+        m2Dir = '1';
+        m1Speed = '1';
+        m2Speed = '1';
+        cout<<"Slow foreward"<<endl;
+        break;
+    case 'B':
+        dir = 'B';
+        m1Dir = '1';
+        m2Dir = '0';
+        m1Speed = '1';
+        m2Speed = '1';
+        cout<<"Going backward"<<endl;
+        break;
+    case 'P':
+        dir = 'S';
+        m1Dir = '0';
+        m2Dir = '0';
+        m1Speed = '0';
+        m2Speed = '0';
+        cout<<"Stopped"<<endl;
+        break;
+    default:
+        dir = 'S';
+        m1Dir = '0';
+        m2Dir = '0';
+        m1Speed = '0';
+        m2Speed = '0';
+        cout<<"Default"<<endl;
+        break;
+    }
+    /*
+    if(a > sizeSlow && a <= (sizeThresh+deadZone)){
+        dir = 'N';
+        m1Dir = '0';
+        m2Dir = '1';
+        m1Speed = '1';
+        m2Speed = '1';
+        cout<<"Going foreward"<<endl;
+    }
+    else if (a < (sizeThresh-deadZone)){
         dir = 'F';
         m1Dir = '0';
         m2Dir = '1';
@@ -207,14 +263,6 @@ void objFollow::moveLine(int a, char& m1Speed, char& m2Speed, char& m1Dir, char&
         m2Speed = '1';
         cout<<"Going backward"<<endl;
     }
-    else if(a > sizeSlow){
-        dir = 'N';
-        m1Dir = '0';
-        m2Dir = '1';
-        m1Speed = '1';
-        m2Speed = '1';
-        cout<<"Going foreward"<<endl;
-    }
     else{
         dir = 'S';
         m1Dir = '0';
@@ -222,7 +270,7 @@ void objFollow::moveLine(int a, char& m1Speed, char& m2Speed, char& m1Dir, char&
         m1Speed = '0';
         m2Speed = '0';
         cout<<"Stopped"<<endl;
-    }
+    }*/
 }
 
 /*stopMovement********************************************************************
