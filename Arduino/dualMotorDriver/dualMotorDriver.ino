@@ -2,11 +2,11 @@
   Output Signals to driver board
   
   Pins for output:
-    Motor 1:
+    Motor 1 (Starbourd):
       12 & 11 control motor rotation
       10 PWM
       
-    Motor 2:
+    Motor 2 (Port):
       8 & 7 control motor rotation
       6 PWM
 */
@@ -75,7 +75,7 @@ void receiveEvent(int howMany){
 void moveMotors(){
 
     M1Speed = serInByte[0]*255/10*.8;
-    M2Speed = serInByte[2]*255/10*.7;
+    M2Speed = serInByte[2]*255/10*.75;
     
     if(serInByte[1] == 0){
       inA1Val = lowVal;

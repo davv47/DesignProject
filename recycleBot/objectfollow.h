@@ -21,7 +21,7 @@ using namespace cv;
 class objFollow{
     public:
     void followObj(string);
-    void waitForSlow(int);
+    void waitForSlow(int, serialCom, bool&);
     void moveLine(int, char&, char&, char&, char&, char&);
     void stopMovement(serialCom);
 };
@@ -34,6 +34,9 @@ void objFollow::followObj(string colour){
     int LHue, HHue, LSat, HSat, LVal, HVal;
     char m1Speed, m2Speed, m1Dir, m2Dir;
     int webCamNum = 1;
+    int xRez = 640/2;
+    int yRez = 480/2;
+    int deadX = 25;
     char dir, lastDir;
     bool loop = true;
 
@@ -44,15 +47,19 @@ void objFollow::followObj(string colour){
     if (!cap.isOpened()){
          cout << "Cannot open the web cam" << endl;
     }
-
+    cap.set(CV_CAP_PROP_FRAME_WIDTH,xRez);
+    cap.set(CV_CAP_PROP_FRAME_HEIGHT,yRez);
     //Get Object to detect
     cap.read(imgOrig);
     objRecongition objRec;
     objRec.getColour(LHue, HHue, LSat, HSat, LVal, HVal, colour);
     cout<<LHue<<endl;
 
+    waitKey(1000);
     //While program not stopped by user
     while (loop){
+        int loopCount = 0;
+        int loopMax = 3;
         cap.read(imgOrig); //get video frame
         //imshow("Original Image", imgOrig);
         morphology objMor;
@@ -77,13 +84,13 @@ void objFollow::followObj(string colour){
 
         //If no object in frame treat object as in centre of window
         if (x<0){
-            x = 319;
+            x = xRez/2-1;
         }
-        x = x-319;
+        x = x-xRez/2-1;
 
         //Move Motors
         //If approximately in middle then move in straight line
-        if (abs(x) < 100){
+        if (abs(x) < deadX){
            moveLine(area, m1Speed, m2Speed, m1Dir, m2Dir, dir);
             x = 0;
         }
@@ -92,13 +99,13 @@ void objFollow::followObj(string colour){
         if(x>0){
             dir = 'R';
             m1Speed = '1';
-            m2Speed = '1';
+            m2Speed = '0';
             m1Dir = '1';
             m2Dir = '1';
         }
         else if (x<0){
             dir = 'L';
-            m1Speed = '1';
+            m1Speed = '0';
             m2Speed = '1';
             m1Dir = '0';
             m2Dir = '0';
@@ -106,38 +113,49 @@ void objFollow::followObj(string colour){
 
         //If direction has changed the stop movement temporarly
         if (dir != lastDir){
-            waitForSlow(500);
+            waitForSlow(500, ser, loop);
         }
+        if (loop){
+            //Send Signal to motors
+            inBuffer[0] = m1Speed;
+            inBuffer[1] = m1Dir;
+            inBuffer[2] = m2Speed;
+            inBuffer[3] = m2Dir;
 
-        //Send Signal to motors
-        inBuffer[0] = m1Speed;
-        inBuffer[1] = m1Dir;
-        inBuffer[2] = m2Speed;
-        inBuffer[3] = m2Dir;
+            //Open Serial Port
+            ser.open();
+            //Send data
+            ardu.write(inBuffer, BUFFER_SIZE);
+            //close Serial Port
+            ardu.Close();
+            //Delay to account for small move & check for end program signal
+            char tmp = waitKey(5);
+            if (tmp == 'c' || tmp == 'C'){
+                stopMovement(ser);
+                loop = false;
+            }
+            bool stepDir = false;
+            if (dir =='R' || dir == 'L' || dir == 'B' || dir == 'N'){
+                stepDir = true;
+            }
+            if (stepDir){
+                loopCount = loopMax;
+            }
+            if (loop && loopCount == loopMax){
+                loopCount = 0;
+                waitForSlow(5, ser, loop);
+            }
+            // Output x
+            cout<<"x is: "<<x<<" Area is: "<<area<<endl;
+            lastDir = dir;
 
-        //Open Serial Port
-        ser.open();
-        //Send data
-        ardu.write(inBuffer, BUFFER_SIZE);
-        //close Serial Port
-        ardu.Close();
-
-        // Output x
-        cout<<"x is: "<<x<<" Area is: "<<area<<endl;
-        lastDir = dir;
-
-        //Delay to account for small move & check for end program signal
-        char tmp = waitKey(1);
-        if (tmp == 'c'){
-            stopMovement(ser);
-            loop = false;
         }
     }
 }
 /*waitForSlow********************************************************************
  * Delay changing directions (do not blow motors)
  * ***************************************************************************/
-void objFollow::waitForSlow(int waitTime){
+void objFollow::waitForSlow(int waitTime, serialCom ser, bool& loop){
     char m1Speed, m2Speed, m1Dir, m2Dir;
     m1Speed = '0';
     m2Speed = '0';
@@ -148,8 +166,17 @@ void objFollow::waitForSlow(int waitTime){
     inBuffer[1] = m1Dir;
     inBuffer[2] = m2Speed;
     inBuffer[3] = m2Dir;
-    waitKey(waitTime);
-
+    //Open Serial Port
+    ser.open();
+    //Send data
+    ardu.write(inBuffer, BUFFER_SIZE);
+    //close Serial Port
+    ardu.Close();
+    char tmp = waitKey(waitTime);
+    if (tmp == 'c' || tmp =='C'){
+        stopMovement(ser);
+        loop = false;
+    }
 }
 
 /*moveLine********************************************************************
@@ -161,8 +188,9 @@ void objFollow::waitForSlow(int waitTime){
  *      -Motor Directions
  * ***************************************************************************/
 void objFollow::moveLine(int a, char& m1Speed, char& m2Speed, char& m1Dir, char& m2Dir, char& dir){
-    int sizeThresh = 25000;
-    int deadZone = 10000;
+    int sizeThresh = 10000;
+    int deadZone = 2000;
+    int sizeSlow = 500;
     if (a < (sizeThresh-deadZone)){
         dir = 'F';
         m1Dir = '0';
@@ -178,6 +206,14 @@ void objFollow::moveLine(int a, char& m1Speed, char& m2Speed, char& m1Dir, char&
         m1Speed = '1';
         m2Speed = '1';
         cout<<"Going backward"<<endl;
+    }
+    else if(a > sizeSlow){
+        dir = 'N';
+        m1Dir = '0';
+        m2Dir = '1';
+        m1Speed = '1';
+        m2Speed = '1';
+        cout<<"Going foreward"<<endl;
     }
     else{
         dir = 'S';

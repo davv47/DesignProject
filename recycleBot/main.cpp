@@ -19,6 +19,9 @@ serialCom ser;
 // Global Declorations of Serial Information
 
 int main(){
+    /*objRecongition obj;
+    obj.getColorRange();
+    return 0;*/
     string colour = "red";
     waitKey(10000);
     objFollow follow;
