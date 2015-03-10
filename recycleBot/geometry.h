@@ -21,12 +21,13 @@ class geometry{
 
         Mat rot(Mat, int);
         Mat crop(Mat, int, int);
-        Mat cropPt(Mat, int, int, Point);
+        Mat cropPt(Mat, Rect);
         Point centre(Mat);
         double angle(Mat);
         int quad(Mat, Point);
         void showCentre(Mat&, Point);
         int size(Mat);
+        int sizeLargest(Mat, Rect);
         void imFlip(Mat&, Mat&);
         Point getCentreOfRect(Rect);
 
@@ -83,14 +84,8 @@ Mat geometry::crop(Mat INimg, int newRows, int newCols){
  * Returns:
  *      -Cropped Image
  * ***************************************************************************/
-Mat geometry::cropPt(Mat INimg, int newRows, int newCols, Point pt){
-    int origRows = INimg.rows;
-    int origCols = INimg.cols;
-    int x = (origRows - newRows)/2 + pt.x;
-    int y = (origCols - newCols)/2 + pt.y;
-    int h = newRows;
-    int w = newCols;
-    _outIM = INimg(Rect(x,y,h,w));
+Mat geometry::cropPt(Mat INimg, Rect rect){
+    _outIM = INimg(rect);
     return _outIM;
 }
 
@@ -124,6 +119,24 @@ int geometry::size(Mat INimg){
     _size = mm.m00;
     return _size;
 }
+
+/*sizeLargest********************************************************************
+ *Gets Size of object in BWimage
+ * Input:
+ *      -INimg: Image to find centroid
+ *      -pt: Point of Contre of Object
+ *      -x: number of cols
+ *      -y: number of rows
+ * Returns:
+ *      -_size: size of the image
+ * ***************************************************************************/
+int geometry::sizeLargest(Mat INimg, Rect rect){
+    Mat imgCrop = cropPt(INimg, rect);
+    Moments mm = moments(imgCrop, true);
+    _size = mm.m00;
+    return _size;
+}
+
 
 /*angle********************************************************************
  *Gets Size of object in BWimage

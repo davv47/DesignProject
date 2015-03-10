@@ -6,6 +6,7 @@
 #include <objRecognition.h>
 #include <geometry.h>
 #include <objectfollow.h>
+#include "nav.h"
 
 #include <SerialStream.h>
 #define PORT "/dev/ttyACM0" //Arduinio Device
@@ -19,12 +20,9 @@ serialCom ser;
 // Global Declorations of Serial Information
 
 int main(){
-    /*objRecongition obj;
-    obj.getColorRange();
-    return 0;*/
     string colour = "red";
     waitKey(10000);
-    objFollow follow;
-    follow.followObj(colour);
+    nav run;
+    run.moveToObj(colour);
 }
 

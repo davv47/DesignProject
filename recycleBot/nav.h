@@ -1,5 +1,5 @@
-#ifndef OBJECTFOLLOW
-#define OBJECTFOLLOW
+#ifndef NAV_H
+#define NAV_H
 
 #include "opencv2/highgui/highgui.hpp"
 #include "opencv2/opencv.hpp"
@@ -19,22 +19,25 @@
 using namespace std;
 using namespace cv;
 
-class objFollow{
+class nav{
     public:
-    void followObj(string);
-    void waitForSlow(int, serialCom, bool&);
+    void moveToObj(string);
+    void waitForSlow(int, serialCom);
     void moveLine(int, char&, char&, char&, char&, char&);
+    void checkForStop(serialCom, int);
     void stopMovement(serialCom);
+    void findObj();
 };
-/*followObj********************************************************************
+/*moveToObj********************************************************************
  *Function for Robot to follow red object
  * ***************************************************************************/
-void objFollow::followObj(string colour){
+void nav::moveToObj(string colour){
     //Get centroid of object
     Mat imgOrig, imgOut;
     Rect rect;
     char m1Speed, m2Speed, m1Dir, m2Dir;
 
+    int waitTime = 5;
     int deadX = 25;
     int areaNoObj = 100;
     char dir, lastDir;
@@ -64,6 +67,7 @@ void objFollow::followObj(string colour){
         int area = geo.sizeLargest(imgOut, rect);
         if (area < areaNoObj){
             cout<<"Too Small"<<endl;
+            findObj();
         }
         imshow("Bounding Image", imgOrig);
 
@@ -99,49 +103,42 @@ void objFollow::followObj(string colour){
 
         //If direction has changed the stop movement temporarly
         if (dir != lastDir){
-            waitForSlow(500, ser, loop);
-        }
-        if (loop){
-            //Send Signal to motors
-            inBuffer[0] = m1Speed;
-            inBuffer[1] = m1Dir;
-            inBuffer[2] = m2Speed;
-            inBuffer[3] = m2Dir;
+            waitForSlow(500, ser);
+    }
+        //Send Signal to motors
+        inBuffer[0] = m1Speed;
+        inBuffer[1] = m1Dir;
+        inBuffer[2] = m2Speed;
+        inBuffer[3] = m2Dir;
 
-            //Open Serial Port
-            ser.open();
-            //Send data
-            ardu.write(inBuffer, BUFFER_SIZE);
-            //close Serial Port
-            ardu.Close();
-            //Delay to account for small move & check for end program signal
-            char tmp = waitKey(5);
-            if (tmp == 'c' || tmp == 'C'){
-                stopMovement(ser);
-                loop = false;
-            }
-            bool stepDir = false;
-            if (dir =='R' || dir == 'L' || dir == 'B' || dir == 'N'){
-                stepDir = true;
-            }
-            if (stepDir){
-                loopCount = loopMax;
-            }
-            if (loop && loopCount == loopMax){
-                loopCount = 0;
-                waitForSlow(5, ser, loop);
-            }
-            // Output x
-            cout<<"x is: "<<x<<" Area is: "<<area<<endl;
-            lastDir = dir;
-
+        //Open Serial Port
+        ser.open();
+        //Send data
+        ardu.write(inBuffer, BUFFER_SIZE);
+        //close Serial Port
+        ardu.Close();
+        //Delay to account for small move & check for end program signal
+        checkForStop(ser, waitTime);
+        bool stepDir = false;
+        if (dir =='R' || dir == 'L' || dir == 'B' || dir == 'N'){
+            stepDir = true;
         }
+        if (stepDir){
+            loopCount = loopMax;
+        }
+        if (loop && loopCount == loopMax){
+            loopCount = 0;
+            waitForSlow(5, ser);
+        }
+        // Output x
+        cout<<"x is: "<<x<<" Area is: "<<area<<endl;
+        lastDir = dir;
     }
 }
 /*waitForSlow********************************************************************
  * Delay changing directions (do not blow motors)
  * ***************************************************************************/
-void objFollow::waitForSlow(int waitTime, serialCom ser, bool& loop){
+void nav::waitForSlow(int waitTime, serialCom ser){
     char m1Speed, m2Speed, m1Dir, m2Dir;
     m1Speed = '0';
     m2Speed = '0';
@@ -158,11 +155,7 @@ void objFollow::waitForSlow(int waitTime, serialCom ser, bool& loop){
     ardu.write(inBuffer, BUFFER_SIZE);
     //close Serial Port
     ardu.Close();
-    char tmp = waitKey(waitTime);
-    if (tmp == 'c' || tmp =='C'){
-        stopMovement(ser);
-        loop = false;
-    }
+    checkForStop(ser, waitTime);
 }
 
 /*moveLine********************************************************************
@@ -173,7 +166,7 @@ void objFollow::waitForSlow(int waitTime, serialCom ser, bool& loop){
  *      -Motor Speeds
  *      -Motor Directions
  * ***************************************************************************/
-void objFollow::moveLine(int a, char& m1Speed, char& m2Speed, char& m1Dir, char& m2Dir, char& dir){
+void nav::moveLine(int a, char& m1Speed, char& m2Speed, char& m1Dir, char& m2Dir, char& dir){
     char sizeRng;
     int sizeThresh = 15000;
     int deadZone = 2000/2;
@@ -224,45 +217,19 @@ void objFollow::moveLine(int a, char& m1Speed, char& m2Speed, char& m1Dir, char&
         cout<<"Default"<<endl;
         break;
     }
-    /*
-    if(a > sizeSlow && a <= (sizeThresh+deadZone)){
-        dir = 'N';
-        m1Dir = '0';
-        m2Dir = '1';
-        m1Speed = '1';
-        m2Speed = '1';
-        cout<<"Going foreward"<<endl;
+}
+
+void nav::checkForStop(serialCom ser, int time){
+    char tmp = waitKey(time);
+    if (tmp == 'c' || tmp == 'C'){
+        stopMovement(ser);
     }
-    else if (a < (sizeThresh-deadZone)){
-        dir = 'F';
-        m1Dir = '0';
-        m2Dir = '1';
-        m1Speed = '1';
-        m2Speed = '1';
-        cout<<"Going foreward"<<endl;
-    }
-    else if(a > (sizeThresh+deadZone)){
-        dir = 'B';
-        m1Dir = '1';
-        m2Dir = '0';
-        m1Speed = '1';
-        m2Speed = '1';
-        cout<<"Going backward"<<endl;
-    }
-    else{
-        dir = 'S';
-        m1Dir = '0';
-        m2Dir = '0';
-        m1Speed = '0';
-        m2Speed = '0';
-        cout<<"Stopped"<<endl;
-    }*/
 }
 
 /*stopMovement********************************************************************
  * Sets the motor speed of all motors to zero (for end of the program)
  * ***************************************************************************/
-void objFollow::stopMovement(serialCom ser){
+void nav::stopMovement(serialCom ser){
     char m1Speed, m2Speed, m1Dir, m2Dir;
     m1Speed = '0';
     m2Speed = '0';
@@ -282,5 +249,8 @@ void objFollow::stopMovement(serialCom ser){
     cout<<"Program stopped by user"<<endl;
 }
 
-#endif // OBJECTFOLLOW
+void nav::findObj(){
 
+}
+
+#endif // NAV_H

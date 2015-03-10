@@ -15,7 +15,7 @@ class objRecongition{
     public:
     void getColour(int&, int&, int&, int&, int&, int&, string);
     void getBound(Mat&, Mat&);
-    void getBound2(Mat&, Mat&, Point&);
+    void getBound2(Mat&, Mat&, Point&, Rect&);
     void showCentre(Mat&, Point);
     void getColorRange();
 };
@@ -28,12 +28,12 @@ class objRecongition{
  *      -HSV values
  * ***************************************************************************/
 void objRecongition::getColour(int &LHue, int &HHue, int &LSat, int &HSat, int &LVal, int &HVal, string colour){
-    //Red       0   -   59
+    /*Red       0   -   59
     //Yellow    60  -   119
     //Green     120 -   179
     //Cyan      180 -   239
     //Blue      240 -   299
-    //Magenta   300 -   359
+    Magenta   300 -   359*/
 
     if(colour == "red"){
         LHue = 0;
@@ -86,13 +86,11 @@ void objRecongition::getBound(Mat &imgOut, Mat &imgOrig){
 /*getBound2********************************************************************
  *Shows bounds of largest object that meets HSV requirements
  * ***************************************************************************/
-void objRecongition::getBound2(Mat &imgOut, Mat &imgOrig, Point& pt){
+void objRecongition::getBound2(Mat &imgOut, Mat &imgOrig, Point& pt, Rect& bounding_rect){
     vector <vector <Point> > contours;
     vector <Vec4i> hierarchy;
-    RNG rng(12345);
     int largest_area=0;
      int largest_contour_index=0;
-    Rect bounding_rect;
     findContours(imgOut, contours, hierarchy, CV_RETR_TREE, CV_CHAIN_APPROX_SIMPLE, Point(0, 0));
 
     vector <vector <Point> >contours_poly(contours.size());

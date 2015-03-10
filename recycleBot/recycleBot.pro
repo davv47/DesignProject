@@ -14,7 +14,9 @@ HEADERS += \
     morphology.h \
     objRecognition.h \
     serialCom.h \
-    objectfollow.h
+    objectfollow.h \
+    imgProcess.h \
+    nav.h
 
 
 win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../../../../../../../../usr/local/lib/release/ -lserial

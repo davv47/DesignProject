@@ -5,7 +5,7 @@ stepper motor number of steps
 
 #include <Wire.h>
 
-int sdaIndex = 7;
+int sdaIndex =10;
 int SDA_Pin = 2;
 int SCL_Pin = 3;
 
@@ -33,25 +33,33 @@ void setup()
   pinMode(windD,OUTPUT);
 }
 
-void loop()
-{
-  delay(1);
+void loop(){
+  delay(1000);
+  stepMotor(25);
 }
 
 // function that executes whenever data is received from master
 // this function is registered as an event, see setup()
 void receiveEvent(int howMany){
-  digitalWrite(13, HIGH);
-  delay(1000);
   while(Wire.available()){
-    int stp = Wire.read(); // receive byte as a character
-    stepMotor(stp);
-  }  
-  digitalWrite(13, LOW);
-  delay(1000);
+    int dir = Wire.read(); // receive byte as a character
+    if (dir == 1) closeAct();
+    else openAct();
+  }
+}
+/**closeAct*******************************************************
+Code to close actuator flaps
+Runs 'till tactile sensors are triggered
+**********************************************************/
+void closeAct(){
 }
 
-
+/**openAct*******************************************************
+Code to open actuator flaps
+How you say? I'm not sure yet
+**********************************************************/
+void openAct(){
+}
 
 void stepMotor(int numStep){
   for (int j=0; j<numStep; j++){
