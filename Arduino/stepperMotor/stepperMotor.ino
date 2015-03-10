@@ -10,10 +10,10 @@ int SDA_Pin = 2;
 int SCL_Pin = 3;
 
 
-int windA = A1;//black wire
-int windB = A2;//red wire
-int windC = A3;//green wire
-int windD = A4;//blue wire
+int windA = 0;//black wire
+int windB = 1;//red wire
+int windC = 2;//green wire
+int windD = 3;//blue wire
 
 void setup()
 {
