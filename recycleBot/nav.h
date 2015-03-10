@@ -33,7 +33,7 @@ class nav{
 
     void waitForSlow(int, serialCom);
     void moveLine(int, char&, char&, char&, char&, char&);
-    void checkForStop(serialCom, int, bool&);
+    void checkForStop(serialCom, int);
     void sendMove(serialCom, char, char, char, char);
     void stopMovement(serialCom);   
 };
@@ -58,13 +58,13 @@ void nav::moveToObj(string colour, VideoCapture cap){
     char m1Speed, m2Speed, m1Dir, m2Dir;
     char dir, lastDir;
     int deadX = 25;
-    int areaNoObj = 100;
+    int areaNoObj = 300;
     waitTime = 5;
-    loop = true;
+    this->loop = true;
     serialCom ser;
 
     //While program not stopped by user
-    while (loop){
+    while (this->loop){
         int loopCount = 0;
         int loopMax = 3;
         Point objectPT;
@@ -128,7 +128,7 @@ void nav::moveToObj(string colour, VideoCapture cap){
             if (stepDir){
                 loopCount = loopMax;
             }
-            if (loop && loopCount == loopMax){
+            if (this->loop && loopCount == loopMax){
                 loopCount = 0;
                 waitForSlow(waitTime, ser);
             }
@@ -147,12 +147,12 @@ void nav::findObj(string colour, VideoCapture cap){
     Rect rect;
     char m1Speed, m2Speed, m1Dir, m2Dir;
     int forwardCnt = 10;
-    int turnCnt = 10;
+    int turnCnt = 3;
     int areaNoObj = 100;
     waitTime = 5;
-    loop = true;
+    this->loop = true;
     serialCom ser;
-    while(loop){
+    while(this->loop){
         Point objectPT;
         imgPro.capFrame(cap, imgOut, imgOrig, colour);
         //imshow("imgBW", imgOut);
@@ -175,16 +175,25 @@ void nav::findObj(string colour, VideoCapture cap){
             m2Speed = '1';
             m1Dir = '0';
             m2Dir = '1';
-            for (int i=0; i<forwardCnt; i++){
+            int i;
+            i = 0;
+            /*while(i<forwardCnt && this->loop){
                 sendMove(ser, m1Speed, m2Speed, m1Dir, m2Dir);
-            }
+                sendMove(ser, '0', '0', '0', '0');
+                i++;
+            }*/
             //Turn Right Slightly
             m1Speed = '1';
             m2Speed = '0';
             m1Dir = '0';
-            m2Dir = '1';
-            for (int i=0; i<turnCnt; i++){
+            m2Dir = '1';`1`12343
+            i = 0;
+            while(i<turnCnt && this->loop){
                 sendMove(ser, m1Speed, m2Speed, m1Dir, m2Dir);
+                for(int j=1; j<2; j++){
+                    sendMove(ser, '0', '0', '0', '0');
+                }
+                i++;
             }
             // Output x
             cout<<"x is: "<<x<<" Area is: "<<area<<endl;
@@ -218,7 +227,7 @@ void nav::waitForSlow(int waitTime, serialCom ser){
     ardu.write(inBuffer, BUFFER_SIZE);
     //close Serial Port
     ardu.Close();
-    checkForStop(ser, waitTime, loop);
+    checkForStop(ser, waitTime);
 }
 
 /*moveLine********************************************************************
@@ -285,10 +294,10 @@ void nav::moveLine(int a, char& m1Speed, char& m2Speed, char& m1Dir, char& m2Dir
 /*checkForStop********************************************************************
  * Check if stop should be done
  * ***************************************************************************/
-void nav::checkForStop(serialCom ser, int time, bool& loop){
+void nav::checkForStop(serialCom ser, int time){
     char tmp = waitKey(time);
     if (tmp == 'c' || tmp == 'C'){
-        loop = false;
+        this->loop = false;
         stopMovement(ser);
     }
 }
@@ -309,7 +318,7 @@ void nav::sendMove(serialCom ser, char m1Speed, char m2Speed, char m1Dir, char m
     //close Serial Port
     ardu.Close();
     //Delay to account for small move & check for end program signal
-    checkForStop(ser, waitTime, loop);
+    checkForStop(ser, waitTime);
 }
 
 /*stopMovement********************************************************************
@@ -333,7 +342,7 @@ void nav::stopMovement(serialCom ser){
     //close Serial Port
     ardu.Close();
     cout<<"Program stopped by user"<<endl;
-    loop = false;
+    this->loop = false;
 }
 
 

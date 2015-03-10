@@ -12,7 +12,7 @@ int serInByte[4];
 void setup() {
   Serial.begin(9600);
   Wire.begin(sdaMotorIndex);
-  Wire.begin(sdaLEDIndex);
+  //Wire.begin(sdaLEDIndex);
   //pinMode(SDA_Pin, INPUT);
   //pinMode(SCL_Pin, INPUT);
   pinMode(ledPin, OUTPUT);
@@ -39,7 +39,7 @@ void loop(){
     }    
     //Serial.println();
     // Motor Signal
-    if (i == 4 && serInByte[0] == 'A'){
+    if (i == 4 && serInByte[0] != 'A'){
       for (int i=0; i<4; i++){
         serInByte[i] = serInByte[i] - '0';
       }
@@ -48,7 +48,7 @@ void loop(){
         Wire.write(serInByte[i]);
       }
       Wire.endTransmission();
-      Wire.beginTransmission(sdaLEDIndex);
+      /*Wire.beginTransmission(sdaLEDIndex);
       int ledVal;
       if (serInByte[0] == 0){
        ledVal = 0;
@@ -57,7 +57,7 @@ void loop(){
         ledVal = 1;
       }
       Wire.write(ledVal);
-      Wire.endTransmission();
+      Wire.endTransmission();*/
     }
     //Actuator Signal
     else if (serInByte[0] == 'A'){
