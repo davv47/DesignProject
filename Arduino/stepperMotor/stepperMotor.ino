@@ -15,7 +15,8 @@ int windB = 6;//red wire
 int windC = 2;//green wire
 int windD = 3;//blue wire
 
-Stepper myStp = Stepper(100, windA, windC, windB, windD);
+//200 step stepper motor
+Stepper myStp = Stepper(200, windA, windC, windB, windD);
 
 void setup()
 {
