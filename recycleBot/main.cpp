@@ -23,6 +23,6 @@ int main(){
     string colour = "red";
     waitKey(10000);
     nav run;
-    run.moveToObj(colour);
+    run.startNav(colour);
 }
 

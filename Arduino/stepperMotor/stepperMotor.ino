@@ -4,16 +4,18 @@ stepper motor number of steps
 *****************************************/
 
 #include <Wire.h>
+#include <Stepper.h>
 
 int sdaIndex =10;
 int SDA_Pin = 2;
 int SCL_Pin = 3;
 
-
 int windA = 0;//black wire
 int windB = 1;//red wire
 int windC = 2;//green wire
 int windD = 3;//blue wire
+
+Stepper myStp = Stepper(100, windA, windB, windC, windD);
 
 void setup()
 {
@@ -31,10 +33,13 @@ void setup()
   pinMode(windB,OUTPUT);
   pinMode(windC,OUTPUT);
   pinMode(windD,OUTPUT);
+  
+  myStp.setSpeed(30); //set motor speed to 30 rpm
 }
 
 void loop(){
-  stepMotor(100);
+  myStp.step(10);
+  delay(1000);
 }
 
 // function that executes whenever data is received from master
