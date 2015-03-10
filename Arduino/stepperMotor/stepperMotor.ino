@@ -10,12 +10,12 @@ int sdaIndex =10;
 int SDA_Pin = 2;
 int SCL_Pin = 3;
 
-int windA = 0;//black wire
-int windB = 1;//red wire
+int windA = 5;//black wire
+int windB = 6;//red wire
 int windC = 2;//green wire
 int windD = 3;//blue wire
 
-Stepper myStp = Stepper(100, windA, windB, windC, windD);
+Stepper myStp = Stepper(100, windA, windC, windB, windD);
 
 void setup()
 {
