@@ -22,9 +22,9 @@ using namespace cv;
 class nav{
     public:
     void moveToObj(string);
-    void waitForSlow(int, serialCom);
+    void waitForSlow(int, serialCom, bool);
     void moveLine(int, char&, char&, char&, char&, char&);
-    void checkForStop(serialCom, int);
+    void checkForStop(serialCom, int, bool&);
     void stopMovement(serialCom);
     void findObj();
 };
@@ -103,7 +103,7 @@ void nav::moveToObj(string colour){
 
         //If direction has changed the stop movement temporarly
         if (dir != lastDir){
-            waitForSlow(500, ser);
+            waitForSlow(500, ser, loop);
     }
         //Send Signal to motors
         inBuffer[0] = m1Speed;
@@ -118,7 +118,7 @@ void nav::moveToObj(string colour){
         //close Serial Port
         ardu.Close();
         //Delay to account for small move & check for end program signal
-        checkForStop(ser, waitTime);
+        checkForStop(ser, waitTime, loop);
         bool stepDir = false;
         if (dir =='R' || dir == 'L' || dir == 'B' || dir == 'N'){
             stepDir = true;
@@ -128,7 +128,7 @@ void nav::moveToObj(string colour){
         }
         if (loop && loopCount == loopMax){
             loopCount = 0;
-            waitForSlow(5, ser);
+            waitForSlow(5, ser, loop);
         }
         // Output x
         cout<<"x is: "<<x<<" Area is: "<<area<<endl;
@@ -138,7 +138,7 @@ void nav::moveToObj(string colour){
 /*waitForSlow********************************************************************
  * Delay changing directions (do not blow motors)
  * ***************************************************************************/
-void nav::waitForSlow(int waitTime, serialCom ser){
+void nav::waitForSlow(int waitTime, serialCom ser, bool loop){
     char m1Speed, m2Speed, m1Dir, m2Dir;
     m1Speed = '0';
     m2Speed = '0';
@@ -155,7 +155,7 @@ void nav::waitForSlow(int waitTime, serialCom ser){
     ardu.write(inBuffer, BUFFER_SIZE);
     //close Serial Port
     ardu.Close();
-    checkForStop(ser, waitTime);
+    checkForStop(ser, waitTime, loop);
 }
 
 /*moveLine********************************************************************
@@ -219,9 +219,13 @@ void nav::moveLine(int a, char& m1Speed, char& m2Speed, char& m1Dir, char& m2Dir
     }
 }
 
-void nav::checkForStop(serialCom ser, int time){
+/*checkForStop********************************************************************
+ * Check if stop should be done
+ * ***************************************************************************/
+void nav::checkForStop(serialCom ser, int time, bool& loop){
     char tmp = waitKey(time);
     if (tmp == 'c' || tmp == 'C'){
+        loop = false;
         stopMovement(ser);
     }
 }

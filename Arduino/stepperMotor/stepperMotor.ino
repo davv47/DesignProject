@@ -34,8 +34,7 @@ void setup()
 }
 
 void loop(){
-  delay(1000);
-  stepMotor(25);
+  stepMotor(100);
 }
 
 // function that executes whenever data is received from master
