@@ -152,9 +152,7 @@ void nav::findObj(string colour, VideoCapture cap){
     waitTime = 5;
     loop = true;
     serialCom ser;
-    cout<<"pre-while"<<endl;
     while(loop){
-        cout<<"in-while"<<endl;
         Point objectPT;
         imgPro.capFrame(cap, imgOut, imgOrig, colour);
         //imshow("imgBW", imgOut);
@@ -163,8 +161,8 @@ void nav::findObj(string colour, VideoCapture cap){
         objRec.getBound2(imgOut, imgOrig, objectPT, rect);
         objRec.showCentre(imgOrig, objectPT);
 
-        namedWindow("Bounding Image", CV_WINDOW_AUTOSIZE);
-        imshow("Bounding Image", imgOrig);
+        namedWindow(imgName, CV_WINDOW_AUTOSIZE);
+        imshow(imgName, imgOrig);
 
         int x = objectPT.x;
         geometry geo;
@@ -172,30 +170,30 @@ void nav::findObj(string colour, VideoCapture cap){
         //Area is too small--contine looking
         if (area < areaNoObj){
             cout<<"Too Small"<<endl;
-            findObj(colour, cap);
+            //Move slightly foreward
+            m1Speed = '1';
+            m2Speed = '1';
+            m1Dir = '0';
+            m2Dir = '1';
+            for (int i=0; i<forwardCnt; i++){
+                sendMove(ser, m1Speed, m2Speed, m1Dir, m2Dir);
+            }
+            //Turn Right Slightly
+            m1Speed = '1';
+            m2Speed = '0';
+            m1Dir = '0';
+            m2Dir = '1';
+            for (int i=0; i<turnCnt; i++){
+                sendMove(ser, m1Speed, m2Speed, m1Dir, m2Dir);
+            }
+            // Output x
+            cout<<"x is: "<<x<<" Area is: "<<area<<endl;
         }
         //Area is big enough--proceed to object
         else{
+            cvDestroyWindow(imgName);
             moveToObj(colour, cap);
         }
-        //Move slightly foreward
-        m1Speed = '1';
-        m2Speed = '1';
-        m1Dir = '0';
-        m2Dir = '1';
-        for (int i=0; i<forwardCnt; i++){
-            sendMove(ser, m1Speed, m2Speed, m1Dir, m2Dir);
-        }
-        //Turn Right Slightly
-        m1Speed = '1';
-        m2Speed = '0';
-        m1Dir = '0';
-        m2Dir = '1';
-        for (int i=0; i<turnCnt; i++){
-            sendMove(ser, m1Speed, m2Speed, m1Dir, m2Dir);
-        }
-        // Output x
-        cout<<"x is: "<<x<<" Area is: "<<area<<endl;
     }
 
 }
