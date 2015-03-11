@@ -124,10 +124,10 @@ void nav::moveToObj(string colour, VideoCapture cap){
                     break;
                 case 'N':
                     dir = 'N';
-                    m1Speed = '0';
+                    m1Speed = '1';
                     m1Dir = '0';
-                    m2Speed = '0';
-                    m2Dir = '0';
+                    m2Speed = '1';
+                    m2Dir = '1';
                     cout<<"Slow foreward"<<endl;
                     break;
                 case 'B':
@@ -135,7 +135,7 @@ void nav::moveToObj(string colour, VideoCapture cap){
                     m1Speed = '1';
                     m1Dir = '1';
                     m2Speed = '1';
-                    m2Dir = '1';
+                    m2Dir = '0';
                     cout<<"Going backward"<<endl;
                     break;
                 case 'S':
@@ -163,7 +163,7 @@ void nav::moveToObj(string colour, VideoCapture cap){
                 m1Speed = '1';
                 m2Speed = '1';
                 m1Dir = '1';
-                m2Dir = '1';
+                m2Dir = '0';
             }
             else if (x<0){
                 dir = 'L';

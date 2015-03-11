@@ -15,6 +15,11 @@ int windB = 6;//red wire
 int windC = 2;//green wire
 int windD = 3;//blue wire
 
+int tp1 = 7;
+int tp2 = 8;
+int ts1 = 9;
+int ts2 = 10;
+
 //200 step stepper motor
 Stepper myStp = Stepper(200, windA, windC, windB, windD);
 
@@ -52,11 +57,13 @@ void receiveEvent(int howMany){
     else openAct();
   }
 }
+
 /**closeAct*******************************************************
 Code to close actuator flaps
 Runs 'till tactile sensors are triggered
 **********************************************************/
 void closeAct(){
+  
 }
 
 /**openAct*******************************************************
@@ -66,63 +73,19 @@ How you say? I'm not sure yet
 void openAct(){
 }
 
-void stepMotor(int numStep){
-  for (int j=0; j<numStep; j++){
-    for(unsigned char i = 0;i < 8; i++){
-       stepSeq(i);
-       delay(5);
-    }
-  }  
+
+/**checkPort*******************************************************
+Code to open actuator flaps
+How you say? I'm not sure yet
+**********************************************************/
+void checkPort(){
+
 }
 
-void stepSeq(unsigned char stepNumber){
-  
-  if(stepNumber == 0x00){
-    digitalWrite(windA,HIGH);
-    digitalWrite(windB,LOW);
-    digitalWrite(windC,LOW);
-    digitalWrite(windD,HIGH);
-  }
-  if(stepNumber == 0x01){
-    digitalWrite(windA,HIGH);
-    digitalWrite(windB,LOW);
-    digitalWrite(windC,LOW);
-    digitalWrite(windD,LOW);
-  }
-  if(stepNumber == 0x02){
-    digitalWrite(windA,HIGH);
-    digitalWrite(windB,HIGH);
-    digitalWrite(windC,LOW);
-    digitalWrite(windD,LOW);
-  }
-  if(stepNumber == 0x03){
-    digitalWrite(windA,LOW);
-    digitalWrite(windB,HIGH);
-    digitalWrite(windC,LOW);
-    digitalWrite(windD,LOW);
-  }
-  if(stepNumber == 0x04){
-    digitalWrite(windA,LOW);
-    digitalWrite(windB,HIGH);
-    digitalWrite(windC,HIGH);
-    digitalWrite(windD,LOW);
-  }
-  if(stepNumber == 0x05){
-    digitalWrite(windA,LOW);
-    digitalWrite(windB,LOW);
-    digitalWrite(windC,HIGH);
-    digitalWrite(windD,LOW);
-  }
-  if(stepNumber == 0x06){
-    digitalWrite(windA,LOW);
-    digitalWrite(windB,LOW);
-    digitalWrite(windC,HIGH);
-    digitalWrite(windD,HIGH);
-  }
-  if(stepNumber == 0x07){
-    digitalWrite(windA,LOW);
-    digitalWrite(windB,LOW);
-    digitalWrite(windC,LOW);
-    digitalWrite(windD,HIGH);
-  }
+/**checkStarbourd*******************************************************
+Code to open actuator flaps
+How you say? I'm not sure yet
+**********************************************************/
+void checkStarboard(){
+
 }
