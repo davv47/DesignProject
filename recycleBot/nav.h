@@ -21,21 +21,23 @@ using namespace cv;
 
 class nav{
     public:
+    serialCom ser;
     imgProcess imgPro;
     int waitTime;
     bool loop;
     Mat imgOrig, imgOut;
-    const char* imgName = "Bounding Image";
+    const char* imgFindObj = "findObj";
+    const char* imgMoveToObj = "moveToObj";
 
     void startNav(string);
     void moveToObj(string, VideoCapture);
      void findObj(string, VideoCapture);
 
-    void waitForSlow(int, serialCom);
+    void waitForSlow(int);
     void moveLine(int, char&, char&, char&, char&, char&);
-    void checkForStop(serialCom, int);
-    void sendMove(serialCom, char, char, char, char);
-    void stopMovement(serialCom);   
+    void checkForStop(int);
+    void sendMove(char, char, char, char);
+    void stopMovement();
 };
 
 /*startMove********************************************************************
@@ -44,9 +46,8 @@ class nav{
 void nav::startNav(string colour){
     VideoCapture cap(imgPro.webCamNum);
     imgPro.openWebcam(cap);
-
-    waitKey(1000);
-    moveToObj(colour, cap);
+    checkForStop(10000);
+    findObj(colour, cap);
 }
 
 /*moveToObj********************************************************************
@@ -57,11 +58,12 @@ void nav::moveToObj(string colour, VideoCapture cap){
     Rect rect;
     char m1Speed, m2Speed, m1Dir, m2Dir;
     char dir, lastDir;
-    int deadX = 25;
+    int deadX = 50;
     int areaNoObj = 300;
     waitTime = 5;
     this->loop = true;
-    serialCom ser;
+
+    namedWindow(imgMoveToObj, CV_WINDOW_AUTOSIZE);
 
     //While program not stopped by user
     while (this->loop){
@@ -74,15 +76,21 @@ void nav::moveToObj(string colour, VideoCapture cap){
         objRecongition objRec;
         objRec.getBound2(imgOut, imgOrig, objectPT, rect);
         objRec.showCentre(imgOrig, objectPT);
-        namedWindow(imgName, CV_WINDOW_AUTOSIZE);
-        imshow(imgName, imgOrig);
+
+
+        if (!imgOrig.empty()){
+            imshow(imgMoveToObj, imgOrig);
+            checkForStop(1);
+        }
 
         int x = objectPT.x;
         geometry geo;
         int area = geo.sizeLargest(imgOut, rect);
         if (area < areaNoObj){
             cout<<"Too Small"<<endl;
-            cvDestroyWindow(imgName);
+            cvDestroyWindow(imgMoveToObj);
+            sendMove('0', '0', '0', '0');
+            checkForStop(1000);
             findObj(colour, cap);
         }
         else{
@@ -101,25 +109,25 @@ void nav::moveToObj(string colour, VideoCapture cap){
             // If in left of frame move motors Dir 1
             if(x>0){
                 dir = 'R';
-                m1Speed = '1';
-                m2Speed = '0';
+                m1Speed = '0';
+                m2Speed = '1';
                 m1Dir = '1';
                 m2Dir = '1';
             }
             else if (x<0){
                 dir = 'L';
-                m1Speed = '0';
-                m2Speed = '1';
+                m1Speed = '1';
+                m2Speed = '0';
                 m1Dir = '0';
                 m2Dir = '0';
             }
 
             //Send movement Signal to motors
-            sendMove(ser, m1Speed, m2Speed, m1Dir, m2Dir);
+            sendMove(m1Speed, m2Speed, m1Dir, m2Dir);
 
             //If direction has changed the stop movement temporarly
             if (dir != lastDir){
-                waitForSlow(500, ser);
+                waitForSlow(500);
             }
             bool stepDir = false;
             if (dir =='R' || dir == 'L' || dir == 'B' || dir == 'N'){
@@ -129,14 +137,16 @@ void nav::moveToObj(string colour, VideoCapture cap){
                 loopCount = loopMax;
             }
             if (this->loop && loopCount == loopMax){
+                sendMove(m1Speed, m2Speed, m1Dir, m2Dir);
                 loopCount = 0;
-                waitForSlow(waitTime, ser);
+                waitForSlow(waitTime);
             }
             // Output x
             cout<<"x is: "<<x<<" Area is: "<<area<<endl;
             lastDir = dir;
         }
     }
+    //cvDestroyWindow(imgMoveToObj);
 }
 
 /*findObj********************************************************************
@@ -151,18 +161,21 @@ void nav::findObj(string colour, VideoCapture cap){
     int areaNoObj = 100;
     waitTime = 5;
     this->loop = true;
-    serialCom ser;
+    namedWindow(imgFindObj, CV_WINDOW_AUTOSIZE);
     while(this->loop){
         Point objectPT;
         imgPro.capFrame(cap, imgOut, imgOrig, colour);
+
         //imshow("imgBW", imgOut);
         //Point objectPT = objGeo.centre(imgBW);
         objRecongition objRec;
         objRec.getBound2(imgOut, imgOrig, objectPT, rect);
         objRec.showCentre(imgOrig, objectPT);
 
-        namedWindow(imgName, CV_WINDOW_AUTOSIZE);
-        imshow(imgName, imgOrig);
+        if (!imgOrig.empty()){
+            imshow(imgFindObj, imgOrig);
+            checkForStop(1);
+        }
 
         int x = objectPT.x;
         geometry geo;
@@ -178,20 +191,20 @@ void nav::findObj(string colour, VideoCapture cap){
             int i;
             i = 0;
             /*while(i<forwardCnt && this->loop){
-                sendMove(ser, m1Speed, m2Speed, m1Dir, m2Dir);
-                sendMove(ser, '0', '0', '0', '0');
+                sendMove(m1Speed, m2Speed, m1Dir, m2Dir);
+                sendMove('0', '0', '0', '0');
                 i++;
             }*/
             //Turn Right Slightly
             m1Speed = '1';
-            m2Speed = '0';
-            m1Dir = '0';
-            m2Dir = '1';`1`12343
+            m2Speed = '1';
+            m1Dir = '1';
+            m2Dir = '1';
             i = 0;
             while(i<turnCnt && this->loop){
-                sendMove(ser, m1Speed, m2Speed, m1Dir, m2Dir);
-                for(int j=1; j<2; j++){
-                    sendMove(ser, '0', '0', '0', '0');
+                sendMove(m1Speed, m2Speed, m1Dir, m2Dir);
+                for(int j=1; j<4; j++){
+                    sendMove('0', '0', '0', '0');
                 }
                 i++;
             }
@@ -200,17 +213,19 @@ void nav::findObj(string colour, VideoCapture cap){
         }
         //Area is big enough--proceed to object
         else{
-            cvDestroyWindow(imgName);
+            cvDestroyWindow(imgFindObj);
+            sendMove('0', '0', '0', '0');
+            checkForStop(1000);
             moveToObj(colour, cap);
         }
     }
-
+    //cvDestroyWindow(imgFindObj);
 }
 
 /*waitForSlow********************************************************************
  * Delay changing directions (do not blow motors)
  * ***************************************************************************/
-void nav::waitForSlow(int waitTime, serialCom ser){
+void nav::waitForSlow(int waitTime){
     char m1Speed, m2Speed, m1Dir, m2Dir;
     m1Speed = '0';
     m2Speed = '0';
@@ -227,7 +242,7 @@ void nav::waitForSlow(int waitTime, serialCom ser){
     ardu.write(inBuffer, BUFFER_SIZE);
     //close Serial Port
     ardu.Close();
-    checkForStop(ser, waitTime);
+    checkForStop(waitTime);
 }
 
 /*moveLine********************************************************************
@@ -294,18 +309,18 @@ void nav::moveLine(int a, char& m1Speed, char& m2Speed, char& m1Dir, char& m2Dir
 /*checkForStop********************************************************************
  * Check if stop should be done
  * ***************************************************************************/
-void nav::checkForStop(serialCom ser, int time){
+void nav::checkForStop(int time){
     char tmp = waitKey(time);
     if (tmp == 'c' || tmp == 'C'){
         this->loop = false;
-        stopMovement(ser);
+        stopMovement();
     }
 }
 
 /*sendMove********************************************************************
  * Sends motor movement signals to serial port
  * ***************************************************************************/
-void nav::sendMove(serialCom ser, char m1Speed, char m2Speed, char m1Dir, char m2Dir){
+void nav::sendMove(char m1Speed, char m2Speed, char m1Dir, char m2Dir){
     inBuffer[0] = m1Speed;
     inBuffer[1] = m1Dir;
     inBuffer[2] = m2Speed;
@@ -318,13 +333,13 @@ void nav::sendMove(serialCom ser, char m1Speed, char m2Speed, char m1Dir, char m
     //close Serial Port
     ardu.Close();
     //Delay to account for small move & check for end program signal
-    checkForStop(ser, waitTime);
+    checkForStop(waitTime);
 }
 
 /*stopMovement********************************************************************
  * Sets the motor speed of all motors to zero (for end of the program)
  * ***************************************************************************/
-void nav::stopMovement(serialCom ser){
+void nav::stopMovement(){
     char m1Speed, m2Speed, m1Dir, m2Dir;
     m1Speed = '0';
     m2Speed = '0';

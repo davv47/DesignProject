@@ -34,10 +34,10 @@ void loop(){
     while(Serial.available()>0){
       char tmpC = Serial.read();
       serInByte[i] = tmpC; 
-      //Serial.print(serInByte[i]);
+      Serial.print(serInByte[i]);
       i++;     
     }    
-    //Serial.println();
+    Serial.println();
     // Motor Signal
     if (i == 4 && serInByte[0] != 'A'){
       for (int i=0; i<4; i++){
