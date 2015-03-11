@@ -80,7 +80,6 @@ void nav::moveToObj(string colour, VideoCapture cap){
 
         if (!imgOrig.empty()){
             imshow(imgMoveToObj, imgOrig);
-            checkForStop(1);
         }
 
         int x = objectPT.x;
@@ -174,7 +173,6 @@ void nav::findObj(string colour, VideoCapture cap){
 
         if (!imgOrig.empty()){
             imshow(imgFindObj, imgOrig);
-            checkForStop(1);
         }
 
         int x = objectPT.x;
