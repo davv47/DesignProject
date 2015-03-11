@@ -90,7 +90,8 @@ void nav::moveToObj(string colour, VideoCapture cap){
             cvDestroyWindow(imgMoveToObj);
             sendMove('0', '0', '0', '0');
             checkForStop(1000);
-            findObj(colour, cap);
+            findObj(colour, cap);            
+            loop = false;
         }
         else{
             //If no object in frame treat object as in centre of window
@@ -102,13 +103,64 @@ void nav::moveToObj(string colour, VideoCapture cap){
             //Move Motors
             //If approximately in middle then move in straight line
             if (abs(x) < deadX){
-               moveLine(area, m1Speed, m2Speed, m1Dir, m2Dir, dir);
+               //moveLine(area, m1Speed, m2Speed, m1Dir, m2Dir, dir);
+                int a = area;
+                char sizeRng;
+                int sizeThresh = 15000;
+                int deadZone = 2000/2;
+                int sizeSlow = 3000;
+                if (a>sizeSlow && a<(sizeThresh-deadZone)) sizeRng = 'N';
+                else if (a<sizeSlow) sizeRng = 'F';
+                else if (a>=(sizeThresh+deadZone)) sizeRng = 'B';
+                else sizeRng = 'S';
+                switch (sizeRng){
+                case 'F':
+                    dir = 'F';
+                    m1Speed = '1';
+                    m1Dir = '0';
+                    m2Speed = '1';
+                    m2Dir = '1';
+                    cout<<"Fast foreward"<<endl;
+                    break;
+                case 'N':
+                    dir = 'N';
+                    m1Speed = '0';
+                    m1Dir = '0';
+                    m2Speed = '0';
+                    m2Dir = '0';
+                    cout<<"Slow foreward"<<endl;
+                    break;
+                case 'B':
+                    dir = 'B';
+                    m1Speed = '1';
+                    m1Dir = '1';
+                    m2Speed = '1';
+                    m2Dir = '1';
+                    cout<<"Going backward"<<endl;
+                    break;
+                case 'S':
+                    dir = 'S';
+                    m1Speed = '0';
+                    m1Dir = '0';
+                    m2Speed = '0';
+                    m2Dir = '0';
+                    cout<<"Stopped"<<endl;
+                    break;
+                default:
+                    dir = 'S';
+                    m1Speed = '0';
+                    m1Dir = '0';
+                    m2Speed = '0';
+                    m2Dir = '0';
+                    cout<<"Default"<<endl;
+                    break;
+                }
                 x = 0;
             }
             // If in left of frame move motors Dir 1
             if(x>0){
                 dir = 'R';
-                m1Speed = '0';
+                m1Speed = '1';
                 m2Speed = '1';
                 m1Dir = '1';
                 m2Dir = '1';
@@ -116,9 +168,9 @@ void nav::moveToObj(string colour, VideoCapture cap){
             else if (x<0){
                 dir = 'L';
                 m1Speed = '1';
-                m2Speed = '0';
+                m2Speed = '1';
                 m1Dir = '0';
-                m2Dir = '0';
+                m2Dir = '1';
             }
 
             //Send movement Signal to motors
@@ -142,6 +194,7 @@ void nav::moveToObj(string colour, VideoCapture cap){
             }
             // Output x
             cout<<"x is: "<<x<<" Area is: "<<area<<endl;
+            cout<<inBuffer<<endl;
             lastDir = dir;
         }
     }
@@ -208,13 +261,15 @@ void nav::findObj(string colour, VideoCapture cap){
             }
             // Output x
             cout<<"x is: "<<x<<" Area is: "<<area<<endl;
+            cout<<inBuffer<<endl;
         }
         //Area is big enough--proceed to object
         else{
             cvDestroyWindow(imgFindObj);
             sendMove('0', '0', '0', '0');
             checkForStop(1000);
-            moveToObj(colour, cap);
+            moveToObj(colour, cap);            
+            loop = false;
         }
     }
     //cvDestroyWindow(imgFindObj);
@@ -256,49 +311,49 @@ void nav::moveLine(int a, char& m1Speed, char& m2Speed, char& m1Dir, char& m2Dir
     int sizeThresh = 15000;
     int deadZone = 2000/2;
     int sizeSlow = 3000;
-    if (a>sizeSlow && a<(sizeThresh-deadZone)) sizeRng = 'S';
+    if (a>sizeSlow && a<(sizeThresh-deadZone)) sizeRng = 'N';
     else if (a<sizeSlow) sizeRng = 'F';
     else if (a>=(sizeThresh+deadZone)) sizeRng = 'B';
-    else sizeRng = 'P';
+    else sizeRng = 'S';
     switch (sizeRng){
     case 'F':
         dir = 'F';
-        m1Dir = '0';
-        m2Dir = '1';
         m1Speed = '1';
-        m2Speed = '1';
+        m1Dir = '0';
+        m2Speed = '1';        
+        m2Dir = '1';
         cout<<"Fast foreward"<<endl;
         break;
-    case 'S':
+    case 'N':
         dir = 'N';
-        m1Dir = '0';
-        m2Dir = '1';
         m1Speed = '1';
+        m1Dir = '0';
         m2Speed = '1';
+        m2Dir = '1';
         cout<<"Slow foreward"<<endl;
         break;
     case 'B':
         dir = 'B';
-        m1Dir = '1';
-        m2Dir = '0';
         m1Speed = '1';
+        m1Dir = '1';
         m2Speed = '1';
+        m2Dir = '1';
         cout<<"Going backward"<<endl;
         break;
-    case 'P':
+    case 'S':
         dir = 'S';
-        m1Dir = '0';
-        m2Dir = '0';
         m1Speed = '0';
+        m1Dir = '0';
         m2Speed = '0';
+        m2Dir = '0';
         cout<<"Stopped"<<endl;
         break;
     default:
         dir = 'S';
-        m1Dir = '0';
-        m2Dir = '0';
         m1Speed = '0';
+        m1Dir = '0';
         m2Speed = '0';
+        m2Dir = '0';
         cout<<"Default"<<endl;
         break;
     }
@@ -332,6 +387,7 @@ void nav::sendMove(char m1Speed, char m2Speed, char m1Dir, char m2Dir){
     ardu.Close();
     //Delay to account for small move & check for end program signal
     checkForStop(waitTime);
+    cout<<inBuffer<<endl;
 }
 
 /*stopMovement********************************************************************

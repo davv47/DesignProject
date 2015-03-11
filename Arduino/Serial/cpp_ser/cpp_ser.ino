@@ -33,16 +33,16 @@ void loop(){
     int i=0;
     while(Serial.available()>0){
       char tmpC = Serial.read();
-      serInByte[i] = tmpC; 
-      Serial.print(serInByte[i]);
+      serInByte[i] = tmpC;
       i++;     
-    }    
-    Serial.println();
+    }
     // Motor Signal
     if (i == 4 && serInByte[0] != 'A'){
       for (int i=0; i<4; i++){
         serInByte[i] = serInByte[i] - '0';
+        //Serial.print(serInByte[i]);
       }
+      //Serial.println();
       Wire.beginTransmission(sdaMotorIndex);
       for(int i=0; i<4; i++){
         Wire.write(serInByte[i]);
@@ -70,6 +70,6 @@ void loop(){
       Serial.println("E");
     }
   }
-  delay(1);
+  delay(10);
 }
 
