@@ -20,7 +20,7 @@ class imgProcess{
         int xRez, yRez;
         imgProcess();
         void openWebcam(VideoCapture&);
-        void capFrame(VideoCapture&, Mat&, Mat&, string);
+        void capFrame(VideoCapture, Mat&, Mat&, string);
 };
 
 imgProcess::imgProcess(){
@@ -37,7 +37,7 @@ void imgProcess::openWebcam(VideoCapture& cap){
     cap.set(CV_CAP_PROP_FRAME_HEIGHT,yRez);
 }
 
-void imgProcess::capFrame(VideoCapture& cap, Mat& imgBW, Mat& imgOrig, string colour){
+void imgProcess::capFrame(VideoCapture cap, Mat& imgBW, Mat& imgOrig, string colour){
     Mat imgHSV;
     int LHue, HHue, LSat, HSat, LVal, HVal;
     cap.read(imgOrig); //get video frame

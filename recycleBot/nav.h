@@ -45,22 +45,25 @@ class nav{
  * ***************************************************************************/
 void nav::startNav(string colour){
     VideoCapture cap(imgPro.webCamNum);
-    imgPro.openWebcam(cap);
+    //imgPro.openWebcam(cap);
     checkForStop(10000);
-    findObj(colour, cap);
+    moveToObj(colour, cap);
 }
 
 /*moveToObj********************************************************************
  *Function for Robot to follow red object
  * ***************************************************************************/
 void nav::moveToObj(string colour, VideoCapture cap){
+    //VideoCapture cap(imgPro.webCamNum);
+    imgPro.openWebcam(cap);
+
     //Get centroid of object
     Rect rect;
     char m1Speed, m2Speed, m1Dir, m2Dir;
     char dir, lastDir;
     int deadX = 50;
     int areaNoObj = 300;
-    waitTime = 5;
+    waitTime = 3;
     this->loop = true;
 
     namedWindow(imgMoveToObj, CV_WINDOW_AUTOSIZE);
@@ -68,19 +71,18 @@ void nav::moveToObj(string colour, VideoCapture cap){
     //While program not stopped by user
     while (this->loop){
         int loopCount = 0;
-        int loopMax = 3;
+        int loopMax = 1;
         Point objectPT;
         imgPro.capFrame(cap, imgOut, imgOrig, colour);
+        if (!imgOrig.empty()){
+            imshow(imgMoveToObj, imgOrig);
+            checkForStop(1);
+        }
         //imshow("imgBW", imgOut);
         //Point objectPT = objGeo.centre(imgBW);
         objRecongition objRec;
         objRec.getBound2(imgOut, imgOrig, objectPT, rect);
         objRec.showCentre(imgOrig, objectPT);
-
-
-        if (!imgOrig.empty()){
-            imshow(imgMoveToObj, imgOrig);
-        }
 
         int x = objectPT.x;
         geometry geo;
@@ -88,9 +90,10 @@ void nav::moveToObj(string colour, VideoCapture cap){
         if (area < areaNoObj){
             cout<<"Too Small"<<endl;
             cvDestroyWindow(imgMoveToObj);
-            sendMove('0', '0', '0', '0');
-            checkForStop(1000);
-            findObj(colour, cap);            
+            //sendMove('0', '0', '0', '0');
+            //checkForStop(1000);
+            waitForSlow(500);
+            findObj(colour, cap);
             loop = false;
         }
         else{
@@ -103,58 +106,7 @@ void nav::moveToObj(string colour, VideoCapture cap){
             //Move Motors
             //If approximately in middle then move in straight line
             if (abs(x) < deadX){
-               //moveLine(area, m1Speed, m2Speed, m1Dir, m2Dir, dir);
-                int a = area;
-                char sizeRng;
-                int sizeThresh = 15000;
-                int deadZone = 2000/2;
-                int sizeSlow = 3000;
-                if (a>sizeSlow && a<(sizeThresh-deadZone)) sizeRng = 'N';
-                else if (a<sizeSlow) sizeRng = 'F';
-                else if (a>=(sizeThresh+deadZone)) sizeRng = 'B';
-                else sizeRng = 'S';
-                switch (sizeRng){
-                case 'F':
-                    dir = 'F';
-                    m1Speed = '1';
-                    m1Dir = '0';
-                    m2Speed = '1';
-                    m2Dir = '1';
-                    cout<<"Fast foreward"<<endl;
-                    break;
-                case 'N':
-                    dir = 'N';
-                    m1Speed = '1';
-                    m1Dir = '0';
-                    m2Speed = '1';
-                    m2Dir = '1';
-                    cout<<"Slow foreward"<<endl;
-                    break;
-                case 'B':
-                    dir = 'B';
-                    m1Speed = '1';
-                    m1Dir = '1';
-                    m2Speed = '1';
-                    m2Dir = '0';
-                    cout<<"Going backward"<<endl;
-                    break;
-                case 'S':
-                    dir = 'S';
-                    m1Speed = '0';
-                    m1Dir = '0';
-                    m2Speed = '0';
-                    m2Dir = '0';
-                    cout<<"Stopped"<<endl;
-                    break;
-                default:
-                    dir = 'S';
-                    m1Speed = '0';
-                    m1Dir = '0';
-                    m2Speed = '0';
-                    m2Dir = '0';
-                    cout<<"Default"<<endl;
-                    break;
-                }
+               moveLine(area, m1Speed, m2Speed, m1Dir, m2Dir, dir);
                 x = 0;
             }
             // If in left of frame move motors Dir 1
@@ -163,14 +115,14 @@ void nav::moveToObj(string colour, VideoCapture cap){
                 m1Speed = '1';
                 m2Speed = '1';
                 m1Dir = '1';
-                m2Dir = '0';
+                m2Dir = '1';
             }
             else if (x<0){
                 dir = 'L';
                 m1Speed = '1';
                 m2Speed = '1';
                 m1Dir = '0';
-                m2Dir = '1';
+                m2Dir = '0';
             }
 
             //Send movement Signal to motors
@@ -178,23 +130,24 @@ void nav::moveToObj(string colour, VideoCapture cap){
 
             //If direction has changed the stop movement temporarly
             if (dir != lastDir){
-                waitForSlow(500);
+                waitForSlow(250);
             }
             bool stepDir = false;
             if (dir =='R' || dir == 'L' || dir == 'B' || dir == 'N'){
                 stepDir = true;
             }
-            if (stepDir){
+            if (!stepDir){
                 loopCount = loopMax;
             }
-            if (this->loop && loopCount == loopMax){
-                sendMove(m1Speed, m2Speed, m1Dir, m2Dir);
-                loopCount = 0;
-                waitForSlow(waitTime);
+            if (!(this->loop && loopCount >= loopMax)){
+                sendMove('0', '0', m1Dir, m2Dir);
+                loopCount = 1;
+                waitForSlow(1);
             }
             // Output x
             cout<<"x is: "<<x<<" Area is: "<<area<<endl;
             cout<<inBuffer<<endl;
+            loopCount++;
             lastDir = dir;
         }
     }
@@ -205,7 +158,13 @@ void nav::moveToObj(string colour, VideoCapture cap){
  * Find Object in working area
  * ***************************************************************************/
 void nav::findObj(string colour, VideoCapture cap){
+    //VideoCapture cap(imgPro.webCamNum);
+    imgPro.openWebcam(cap);
+
     //Get centroid of object
+    int loopCount = 0;
+    int loopMax = 3;
+
     Rect rect;
     char m1Speed, m2Speed, m1Dir, m2Dir;
     int forwardCnt = 10;
@@ -216,17 +175,17 @@ void nav::findObj(string colour, VideoCapture cap){
     namedWindow(imgFindObj, CV_WINDOW_AUTOSIZE);
     while(this->loop){
         Point objectPT;
-        imgPro.capFrame(cap, imgOut, imgOrig, colour);
+        imgPro.capFrame(cap, imgOut, imgOrig, colour);        
+        if (!imgOrig.empty()){
+            imshow(imgFindObj, imgOrig);
+            checkForStop(1);
+        }
 
         //imshow("imgBW", imgOut);
         //Point objectPT = objGeo.centre(imgBW);
         objRecongition objRec;
         objRec.getBound2(imgOut, imgOrig, objectPT, rect);
         objRec.showCentre(imgOrig, objectPT);
-
-        if (!imgOrig.empty()){
-            imshow(imgFindObj, imgOrig);
-        }
 
         int x = objectPT.x;
         geometry geo;
@@ -235,30 +194,29 @@ void nav::findObj(string colour, VideoCapture cap){
         if (area < areaNoObj){
             cout<<"Too Small"<<endl;
             //Move slightly foreward
-            m1Speed = '1';
+            /*m1Speed = '1';
             m2Speed = '1';
             m1Dir = '0';
             m2Dir = '1';
             int i;
             i = 0;
-            /*while(i<forwardCnt && this->loop){
+            while(i<forwardCnt && this->loop){
                 sendMove(m1Speed, m2Speed, m1Dir, m2Dir);
                 sendMove('0', '0', '0', '0');
                 i++;
             }*/
             //Turn Right Slightly
             m1Speed = '1';
-            m2Speed = '1';
+            m2Speed = '0';
             m1Dir = '1';
             m2Dir = '1';
-            i = 0;
-            while(i<turnCnt && this->loop){
-                sendMove(m1Speed, m2Speed, m1Dir, m2Dir);
-                for(int j=1; j<4; j++){
-                    sendMove('0', '0', '0', '0');
-                }
-                i++;
+            //i = 0;
+            sendMove(m1Speed, m2Speed, m1Dir, m2Dir);
+            if (!(this->loop && loopCount >= loopMax)){
+                waitForSlow(500);
+                loopCount = 0;
             }
+            loopCount++;
             // Output x
             cout<<"x is: "<<x<<" Area is: "<<area<<endl;
             cout<<inBuffer<<endl;
@@ -266,8 +224,9 @@ void nav::findObj(string colour, VideoCapture cap){
         //Area is big enough--proceed to object
         else{
             cvDestroyWindow(imgFindObj);
-            sendMove('0', '0', '0', '0');
-            checkForStop(1000);
+            //sendMove('0', '0', '0', '0');
+            //checkForStop(1000);
+            waitForSlow(500);
             moveToObj(colour, cap);            
             loop = false;
         }
@@ -310,14 +269,14 @@ void nav::moveLine(int a, char& m1Speed, char& m2Speed, char& m1Dir, char& m2Dir
     char sizeRng;
     int sizeThresh = 15000;
     int deadZone = 2000/2;
-    int sizeSlow = 3000;
+    int sizeSlow = 2000;
     if (a>sizeSlow && a<(sizeThresh-deadZone)) sizeRng = 'N';
     else if (a<sizeSlow) sizeRng = 'F';
     else if (a>=(sizeThresh+deadZone)) sizeRng = 'B';
     else sizeRng = 'S';
     switch (sizeRng){
     case 'F':
-        dir = 'F';
+        dir = 'F'; //normally 'F' limiting to slow forward
         m1Speed = '1';
         m1Dir = '0';
         m2Speed = '1';        
@@ -337,7 +296,7 @@ void nav::moveLine(int a, char& m1Speed, char& m2Speed, char& m1Dir, char& m2Dir
         m1Speed = '1';
         m1Dir = '1';
         m2Speed = '1';
-        m2Dir = '1';
+        m2Dir = '0';
         cout<<"Going backward"<<endl;
         break;
     case 'S':
