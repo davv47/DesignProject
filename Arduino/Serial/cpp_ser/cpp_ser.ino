@@ -61,12 +61,13 @@ void loop(){
       Wire.endTransmission();
     }
     else if (serInByte[0] == 'S'){
-      int goInd;
+      char goInd;
       Wire.requestFrom(sdaSensorIndex, 1);
       while(Wire.available()){
         goInd = Wire.read();
       }
       Serial.write(goInd);
+      Serial.println(goInd);
     }      
     else{
       Serial.println("E");

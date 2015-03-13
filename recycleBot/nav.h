@@ -240,20 +240,22 @@ void nav::findObj(string colour, VideoCapture cap){
  * ***************************************************************************/
 void nav::closeMove(){
     char senseData;
-    inBuffer[0] = 'S';
-    inBuffer[1] = 'X';
-    inBuffer[2] = 'X';
-    inBuffer[3] = 'X';
-    ser.open();
-    //Open Serial Port
-    ser.open();
-    //Send data
-    ardu.write(inBuffer, BUFFER_SIZE);
-    //Read Response
-    ardu>>senseData;
-    //close Serial Port
-    ardu.Close();
-    cout<<senseData<<endl;
+    loop = true;
+    while(loop){
+        inBuffer[0] = 'S';
+        inBuffer[1] = 'X';
+        inBuffer[2] = 'X';
+        inBuffer[3] = 'X';
+        //Open Serial Port
+        ser.open();
+        //Send data
+        ardu.write(inBuffer, BUFFER_SIZE);
+        //Read Response
+        ardu>>senseData;
+        //close Serial Port
+        ardu.Close();
+        cout<<senseData<<endl;
+    }
 }
 
 /*waitForSlow********************************************************************
