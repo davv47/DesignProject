@@ -31,13 +31,16 @@ void loop(){
 
 // function that executes whenever data is received from master
 // this function is registered as an event, see setup()
-void requestEvent(int aCount){
-  int dist = getSenseDist();
+void requestEvent(){
+  uint8_t buffer[2];
+  int dist =  55;//getSenseDist();
+  buffer[0] = dist >> 8;
+  buffer[1] = dist & 0xff;
   if (dist == 1){
-    Wire.write(1);
+    Wire.write(buffer, 2);
   }
   else{
-    Wire.write(0);
+    Wire.write(buffer, 2);
   }
 }
 

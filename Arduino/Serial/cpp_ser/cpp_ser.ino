@@ -32,14 +32,14 @@ void setup() {
     serInByte[0] == Sensor Signal
 **********************************************************/
 void loop(){
-  if (Serial.available()>0){  
+  //if (Serial.available()>0){  
     int i=0;
-    while(Serial.available()>0){
+    /*while(Serial.available()>0){
       char tmpC = Serial.read();
       serInByte[i] = tmpC - '0';
       //Serial.print(tmpC);
       i++;     
-    }
+    }*/
     // Motor Signal
     if (serInByte[0] ==  1){
       for (int i=0; i<4; i++){
@@ -62,10 +62,10 @@ void loop(){
       Wire.write(serInByte[1]);
       Wire.endTransmission();
       Wire.requestFrom(sdaActIndex, 1);
-      while(wire.available()){
+      while(Wire.available()){
         finInd = Wire.read();
       }
-      Serial.write(inInd);
+      Serial.write(finInd);
     }
     //Sensor Signal
     else if (serInByte[0] == 3){
@@ -73,18 +73,26 @@ void loop(){
       int goInd;
       //Serial.println("In sensor");
       Wire.beginTransmission(sdaSensorIndex);
-      Wire.requestFrom(sdaSensorIndex, 1);
-      while(Wire.available()){
-        goInd = Wire.read();
+      int avail = Wire.requestFrom(sdaSensorIndex, 1);
+      if(avail == 1){
+        int receivedValue = Wire.read() << 8 | Wire.read();
+        Serial.println(receivedValue);
       }
+      else{
+        Serial.print("Unexpected number of bytes received: ");
+        Serial.println(avail);
+      }
+      /*while(Wire.available()){
+        goInd = Wire.read();
+      }*/
       Wire.endTransmission();
       digitalWrite(ledPin, LOW);      
-      Serial.println(goInd); // write
+      //Serial.println(goInd); // write
     }      
     else{
       //Serial.println("E");
     }
-  }
+  //}
   delay(1);
 }
 
