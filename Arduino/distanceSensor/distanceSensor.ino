@@ -33,9 +33,9 @@ void loop(){
 // this function is registered as an event, see setup()
 void requestEvent(){
   byte dist = 1;//getSenseDist();
-  digitalWrite(ledPin, HIGH);
+  //digitalWrite(ledPin, HIGH);
   Wire.write(dist);
-  digitalWrite(ledPin, LOW);
+  //digitalWrite(ledPin, LOW);
 }
 
 /**getSenseDist*******************************************************

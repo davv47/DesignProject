@@ -242,19 +242,23 @@ void nav::closeMove(){
     char senseData;
     loop = true;
     while(loop){
-        inBuffer[0] = 'S';
+
+        inBuffer[0] = '3';
         inBuffer[1] = 'X';
         inBuffer[2] = 'X';
         inBuffer[3] = 'X';
+        cout<<"Attempting to Write: "<<inBuffer[0]<<endl;
         //Open Serial Port
         ser.open();
+        cout<<"Port Open"<<endl;
         //Send data
         ardu.write(inBuffer, BUFFER_SIZE);
         //Read Response
+        cout<<"Data sent, waiting for Response"<<endl;
         ardu>>senseData;
         //close Serial Port
         ardu.Close();
-        cout<<senseData<<endl;
+        cout<<"Port Closed, got data: "<<atoi(&senseData)<<endl;
     }
 }
 
