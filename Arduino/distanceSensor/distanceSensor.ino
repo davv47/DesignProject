@@ -33,16 +33,17 @@ void loop(){
 // function that executes whenever data is received from master
 // this function is registered as an event, see setup()
 void requestEvent(){
-  int dist = getSenseDist();
+  char dist = getSenseDist();
   Wire.write(dist);
 }
 
 /**getSenseDist*******************************************************
 Get sensor distance from object
 **********************************************************/
-int getSenseDist(){
+char getSenseDist(){
   int senseVals = 10;
   int val = 0;
+  char ind;
   int valThresh = 450;
   for (int i=0; i<senseVals; i++){
     val = val + analogRead(A2);
@@ -55,6 +56,12 @@ int getSenseDist(){
   else{
     val = 0;
   }
-  return val;
+  if (val == 1){
+    ind = '1';
+  }
+  else{
+    ind = '0';
+  }
+  return ind;
 }
 
