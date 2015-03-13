@@ -31,7 +31,8 @@ class nav{
 
     void startNav(string);
     void moveToObj(string, VideoCapture);
-     void findObj(string, VideoCapture);
+    void findObj(string, VideoCapture);
+    void closeMove();
 
     void waitForSlow(int);
     void moveLine(int, char&, char&, char&, char&, char&);
@@ -232,6 +233,27 @@ void nav::findObj(string colour, VideoCapture cap){
         }
     }
     //cvDestroyWindow(imgFindObj);
+}
+
+/*closeMove********************************************************************
+ * fine approach using sensor
+ * ***************************************************************************/
+void nav::closeMove(){
+    char senseData;
+    inBuffer[0] = 'S';
+    inBuffer[1] = 'X';
+    inBuffer[2] = 'X';
+    inBuffer[3] = 'X';
+    ser.open();
+    //Open Serial Port
+    ser.open();
+    //Send data
+    ardu.write(inBuffer, BUFFER_SIZE);
+    //Read Response
+    ardu>>senseData;
+    //close Serial Port
+    ardu.Close();
+    cout<<senseData<<endl;
 }
 
 /*waitForSlow********************************************************************

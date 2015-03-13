@@ -10,26 +10,32 @@ int sdaIndex =10;
 int SDA_Pin = 2;
 int SCL_Pin = 3;
 
-int windA = 5;//black wire
-int windB = 6;//red wire
-int windC = 2;//green wire
-int windD = 3;//blue wire
+int windPA = 5;//black wire
+int windPB = 6;//red wire
+int windPC = 2;//green wire
+int windPD = 3;//blue wire
 
-int tp1 = 7;
-int tp2 = 8;
-int ts1 = 9;
-int ts2 = 10;
+int windSA = 5;//black wire
+int windSB = 6;//red wire
+int windSC = 2;//green wire
+int windSD = 3;//blue wire
+
+int tp = 7;//Changed to Analog Pin
+int ts = 8; //Changed to Analog Pin
+
+int stepperMotorSteps = 200;
 
 //200 step stepper motor
-Stepper myStp = Stepper(200, windA, windC, windB, windD);
+Stepper myStp = Stepper(stepperMotorSteps, windPA, windPC, windPB, windPD);
 
 void setup()
 {
   Wire.begin(sdaIndex);           // join i2c bus with address
   
-  //Disable Internal Pullup Resistors
+  /*Disable Internal Pullup Resistors
   pinMode(SDA_Pin, INPUT);
   pinMode(SCL_Pin, INPUT);
+  */
   
   Wire.onReceive(receiveEvent); // register event
   Serial.begin(9600);           // start serial for output
@@ -39,6 +45,9 @@ void setup()
   pinMode(windB,OUTPUT);
   pinMode(windC,OUTPUT);
   pinMode(windD,OUTPUT);
+  
+  pinMode(tp, INPUT);
+  pinMode(ts, INPUT);
   
   myStp.setSpeed(30); //set motor speed to 30 rpm
 }
@@ -58,12 +67,29 @@ void receiveEvent(int howMany){
   }
 }
 
-/**closeAct*******************************************************
+/**moveAct*******************************************************
 Code to close actuator flaps
 Runs 'till tactile sensors are triggered
 **********************************************************/
-void closeAct(){
-  
+void moveAct(char dir){
+  int maxStep = stepperMotorSteps/4*.8; //80% of 90 degree rurn 
+  int i = 0;
+  int dirInd;
+  int numSteps = 10;
+  if (dir =='C'){
+    dirInd = 1;
+  }
+  else{
+    dirInd = -1;
+  }    
+  boolean boolTouchPort = checkPin(tp);
+  boolean boolTouchStar = checkPin(ts);
+  while(i<maxStep || (!boolTouchPort && !boolTouchStar)){
+    boolTouchPort = checkPin(tp);
+    boolTouchStar = checkPin(ts);
+    myStp.step(numSteps);
+    i = i + numSteps;
+  }
 }
 
 /**openAct*******************************************************
@@ -73,19 +99,27 @@ How you say? I'm not sure yet
 void openAct(){
 }
 
-
-/**checkPort*******************************************************
+/**closeAct*******************************************************
 Code to open actuator flaps
 How you say? I'm not sure yet
 **********************************************************/
-void checkPort(){
-
+void closeAct(){
 }
 
-/**checkStarbourd*******************************************************
+
+/**checkPin*******************************************************
 Code to open actuator flaps
 How you say? I'm not sure yet
 **********************************************************/
-void checkStarboard(){
-
+boolean checkPin(int pin){
+  boolean boolTouchPort;
+  int highThresh = 1024/2;
+  int tmpVal = analogRead(pin);
+  if (tmpVal <= highThresh){
+    boolTouchPort = true;
+  }
+  else{
+    boolTouchPort = true;
+  }
+  return boolTouchPort;
 }

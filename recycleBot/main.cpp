@@ -20,9 +20,10 @@ serialCom ser;
 // Global Declorations of Serial Information
 
 int main(){
-    string colour = "red";
+     nav run;
+    /*string colour = "red";
     waitKey(10000);
-    nav run;
-    run.startNav(colour);
+    run.startNav(colour);*/
+     run.closeMove();
 }
 
