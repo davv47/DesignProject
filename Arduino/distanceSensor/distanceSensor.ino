@@ -33,7 +33,7 @@ void loop(){
 // this function is registered as an event, see setup()
 void requestEvent(){
   uint8_t buffer[2];
-  int dist =  55;//getSenseDist();
+  int dist = getSenseDist();
   buffer[0] = dist >> 8;
   buffer[1] = dist & 0xff;
   if (dist == 1){
@@ -67,7 +67,7 @@ int getSenseDist(){
     ind = 1;
   }
   else{
-    ind = 0;
+    ind = -1;
   }
   return ind;
 }

@@ -73,8 +73,8 @@ void loop(){
       int goInd;
       //Serial.println("In sensor");
       Wire.beginTransmission(sdaSensorIndex);
-      int avail = Wire.requestFrom(sdaSensorIndex, 1);
-      if(avail == 1){
+      int avail = Wire.requestFrom(sdaSensorIndex, 2);
+      if(avail == 2){
         int receivedValue = Wire.read() << 8 | Wire.read();
         Serial.println(receivedValue);
       }
@@ -93,6 +93,6 @@ void loop(){
       //Serial.println("E");
     }
   //}
-  delay(1);
+  delay(1000);
 }
 
