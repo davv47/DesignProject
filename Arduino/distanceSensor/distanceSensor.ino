@@ -4,7 +4,7 @@ code to get sensor readings
 
 #include <Wire.h>
 
-int sdaIndex =11;
+int sdaIndex = 11;
 int SDA_Pin = 2;
 int SCL_Pin = 3;
 
@@ -17,11 +17,9 @@ void setup(){
   
   /*Disable Internal Pullup Resistors
   pinMode(SDA_Pin, INPUT);
-  pinMode(SCL_Pin, INPUT);
-  */
+  pinMode(SCL_Pin, INPUT);  */
   
   Wire.onRequest(requestEvent);
-  Serial.begin(9600);           // start serial for output
   pinMode(ledPin, OUTPUT);
   
   pinMode(sensePin, INPUT);
@@ -34,20 +32,19 @@ void loop(){
 // function that executes whenever data is received from master
 // this function is registered as an event, see setup()
 void requestEvent(){
-  char dist = getSenseDist();
+  byte dist = 1;//getSenseDist();
   digitalWrite(ledPin, HIGH);
   Wire.write(dist);
-  delay(500);
   digitalWrite(ledPin, LOW);
 }
 
 /**getSenseDist*******************************************************
 Get sensor distance from object
 **********************************************************/
-char getSenseDist(){
+byte getSenseDist(){
   int senseVals = 10;
   int val = 0;
-  char ind;
+  byte ind;
   int valThresh = 450;
   for (int i=0; i<senseVals; i++){
     val = val + analogRead(A2);
@@ -61,10 +58,10 @@ char getSenseDist(){
     val = 0;
   }
   if (val == 1){
-    ind = '1';
+    ind = 1;
   }
   else{
-    ind = '0';
+    ind = 0;
   }
   return ind;
 }
