@@ -2,7 +2,6 @@
 
 int ledPin = 13;
 const int sdaMotorIndex = 9;
-const int sdaLEDIndex = 8;
 const int sdaActIndex = 10;
 const int sdaSensorIndex = 11;
 const int SDA_Pin = 2;
@@ -33,7 +32,7 @@ void setup() {
     serInByte[0] == Sensor Signal
 **********************************************************/
 void loop(){
-  //if (Serial.available()>0){  
+  if (Serial.available()>0){  
     int i=0;
     while(Serial.available()>0){
       char tmpC = Serial.read();
@@ -56,27 +55,36 @@ void loop(){
       
     }
     //Actuator Signal
-    else if (serInByte[0] == 'A'){
+    else if (serInByte[0] == 4){
+      int finInd;
       Wire.beginTransmission(sdaActIndex);
       //Send Direction Signal
       Wire.write(serInByte[1]);
       Wire.endTransmission();
+      Wire.requestFrom(sdaActIndex, 1);
+      while(wire.available()){
+        finInd = Wire.read();
+      }
+      Serial.write(inInd);
     }
+    //Sensor Signal
     else if (serInByte[0] == 3){
       digitalWrite(ledPin, HIGH);
       int goInd;
       //Serial.println("In sensor");
+      Wire.beginTransmission(sdaSensorIndex);
       Wire.requestFrom(sdaSensorIndex, 1);
       while(Wire.available()){
         goInd = Wire.read();
       }
+      Wire.endTransmission();
       digitalWrite(ledPin, LOW);      
       Serial.println(goInd); // write
     }      
     else{
       //Serial.println("E");
     }
-  //}
+  }
   delay(1);
 }
 

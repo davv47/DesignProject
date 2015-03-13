@@ -31,17 +31,20 @@ void loop(){
 
 // function that executes whenever data is received from master
 // this function is registered as an event, see setup()
-void requestEvent(){
-  byte dist = 1;//getSenseDist();
-  //digitalWrite(ledPin, HIGH);
-  Wire.write(dist);
-  //digitalWrite(ledPin, LOW);
+void requestEvent(int aCount){
+  int dist = getSenseDist();
+  if (dist == 1){
+    Wire.write(1);
+  }
+  else{
+    Wire.write(0);
+  }
 }
 
 /**getSenseDist*******************************************************
 Get sensor distance from object
 **********************************************************/
-byte getSenseDist(){
+int getSenseDist(){
   int senseVals = 10;
   int val = 0;
   byte ind;

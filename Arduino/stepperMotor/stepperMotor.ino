@@ -23,11 +23,13 @@ int windSD = 3;//blue wire
 int tp = 7;//Changed to Analog Pin
 int ts = 8; //Changed to Analog Pin
 
+char dir;
+
 int stepperMotorSteps = 200;
 
 //200 step stepper motor
-Stepper myStp = Stepper(stepperMotorSteps, windPA, windPC, windPB, windPD);
-
+Stepper stpPort = Stepper(stepperMotorSteps, windPA, windPC, windPB, windPD);
+Stepper stpStar = Stepper(stepperMotorSteps, windSA, windSC, windSB, windSD);
 void setup()
 {
   Wire.begin(sdaIndex);           // join i2c bus with address
@@ -36,42 +38,48 @@ void setup()
   pinMode(SDA_Pin, INPUT);
   pinMode(SCL_Pin, INPUT);
   */
-  
-  Wire.onReceive(receiveEvent); // register event
-  Serial.begin(9600);           // start serial for output
+  Wire.onReceive(receiveEvent);
+  Wire.onRequest(requestEvent);
   pinMode(13, OUTPUT);
   
-  pinMode(windA,OUTPUT);
-  pinMode(windB,OUTPUT);
-  pinMode(windC,OUTPUT);
-  pinMode(windD,OUTPUT);
+  pinMode(windPA,OUTPUT);
+  pinMode(windPB,OUTPUT);
+  pinMode(windPC,OUTPUT);
+  pinMode(windPD,OUTPUT);
+  
+  pinMode(windSA,OUTPUT);
+  pinMode(windSB,OUTPUT);
+  pinMode(windSC,OUTPUT);
+  pinMode(windSD,OUTPUT);
   
   pinMode(tp, INPUT);
   pinMode(ts, INPUT);
   
-  myStp.setSpeed(30); //set motor speed to 30 rpm
+  stpPort.setSpeed(30); //set motor speed to 30 rpm
+  stpPort.setSpeed(30); //set motor speed to 30 rpm
 }
 
 void loop(){
-  myStp.step(10);
-  delay(1000);
+  delay(1);
 }
 
-// function that executes whenever data is received from master
-// this function is registered as an event, see setup()
-void receiveEvent(int howMany){
+void receiveEvent(){
   while(Wire.available()){
-    int dir = Wire.read(); // receive byte as a character
-    if (dir == 1) closeAct();
-    else openAct();
+    dir = Wire.read()
   }
 }
+
+void requestEvent(){
+  moveAct();
+  Wire.write(1);
+}
+
 
 /**moveAct*******************************************************
 Code to close actuator flaps
 Runs 'till tactile sensors are triggered
 **********************************************************/
-void moveAct(char dir){
+void moveAct(){
   int maxStep = stepperMotorSteps/4*.8; //80% of 90 degree rurn 
   int i = 0;
   int dirInd;
