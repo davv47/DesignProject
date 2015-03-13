@@ -10,6 +10,7 @@ int SCL_Pin = 3;
 
 //Pin analog output of senesor is attached to
 int sensePin = A2;
+int ledPin = 13;
 
 void setup(){
   Wire.begin(sdaIndex);           // join i2c bus with address
@@ -21,7 +22,7 @@ void setup(){
   
   Wire.onRequest(requestEvent);
   Serial.begin(9600);           // start serial for output
-  pinMode(13, OUTPUT);
+  pinMode(ledPin, OUTPUT);
   
   pinMode(sensePin, INPUT);
 }
@@ -34,7 +35,10 @@ void loop(){
 // this function is registered as an event, see setup()
 void requestEvent(){
   char dist = getSenseDist();
+  digitalWrite(ledPin, HIGH);
   Wire.write(dist);
+  delay(500);
+  digitalWrite(ledPin, LOW);
 }
 
 /**getSenseDist*******************************************************
