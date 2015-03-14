@@ -55,20 +55,21 @@ void setup(){
   pinMode(tp, INPUT);
   pinMode(ts, INPUT);
   
-  stpPort.setSpeed(30); //set motor speed to 30 rpm
-  stpPort.setSpeed(30); //set motor speed to 30 rpm
+  stpPort.setSpeed(10); //set motor speed to 30 rpm
+  stpPort.setSpeed(10); //set motor speed to 30 rpm
 }
 
 void loop(){
+  int steps = 20;
   delay(1000);
   dir = 'C';
   //moveAct();
-  stpPort.step(10);
-  stpStar.step(-10);
+  stpPort.step(steps);
+  stpStar.step(-1*steps*);
   delay(1000);
   dir = 'O';
-  stpPort.step(-10);
-  stpStar.step(10);
+  stpPort.step(-1*steps);
+  stpStar.step(steps);
   //moveAct();
 }
 
