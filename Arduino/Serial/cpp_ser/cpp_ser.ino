@@ -13,10 +13,11 @@ void setup() {
   Serial.begin(9600);
   Wire.begin(sdaMotorIndex);
   Wire.begin(sdaSensorIndex);
+  Wire.begin(sdaActIndex);
   //pinMode(SDA_Pin, INPUT);
   //pinMode(SCL_Pin, INPUT);
   pinMode(ledPin, OUTPUT);
-  serInByte[0] = 3;
+  serInByte[0] = 4;
   
 }
 /*********************************************************
@@ -54,23 +55,10 @@ void loop(){
       Wire.endTransmission();
       
     }
-    //Actuator Signal
-    else if (serInByte[0] == 4){
-      int finInd;
-      Wire.beginTransmission(sdaActIndex);
-      //Send Direction Signal
-      Wire.write(serInByte[1]);
-      Wire.endTransmission();
-      Wire.requestFrom(sdaActIndex, 1);
-      while(Wire.available()){
-        finInd = Wire.read();
-      }
-      Serial.write(finInd);
-    }
     //Sensor Signal
     else if (serInByte[0] == 3){
       digitalWrite(ledPin, HIGH);
-      int goInd;
+      byte goInd;
       //Serial.println("In sensor");
       Wire.beginTransmission(sdaSensorIndex);
       Wire.requestFrom(sdaSensorIndex, 1);
@@ -81,6 +69,22 @@ void loop(){
       digitalWrite(ledPin, LOW);      
       Serial.println(goInd); // write
     }      
+    //Actuator Signal
+    else if (serInByte[0] == 4){
+      int finInd;
+      Wire.beginTransmission(sdaActIndex);
+      //Send Direction Signal
+      //Wire.write(serInByte[1]);
+      Wire.write('C');
+      Wire.endTransmission();
+      Serial.println("Writing Direction");
+      Wire.requestFrom(sdaActIndex, 1);
+      while(Wire.available()){
+        finInd = Wire.read();
+      }
+      Serial.println("Move Finished");
+      Serial.write(finInd);
+    }
     else{
       //Serial.println("E");
     }

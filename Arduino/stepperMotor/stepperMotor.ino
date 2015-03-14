@@ -15,10 +15,10 @@ int windPB = 6;//red wire
 int windPC = 2;//green wire
 int windPD = 3;//blue wire
 
-int windSA = 5;//black wire
-int windSB = 6;//red wire
-int windSC = 2;//green wire
-int windSD = 3;//blue wire
+int windSA = A0;//black wire
+int windSB = A1;//red wire
+int windSC = A2;//green wire
+int windSD = A3;//blue wire
 
 int tp = 7;//Changed to Analog Pin
 int ts = 8; //Changed to Analog Pin
@@ -30,14 +30,14 @@ int stepperMotorSteps = 200;
 //200 step stepper motor
 Stepper stpPort = Stepper(stepperMotorSteps, windPA, windPC, windPB, windPD);
 Stepper stpStar = Stepper(stepperMotorSteps, windSA, windSC, windSB, windSD);
-void setup()
-{
+
+void setup(){
   Wire.begin(sdaIndex);           // join i2c bus with address
   
-  /*Disable Internal Pullup Resistors
-  pinMode(SDA_Pin, INPUT);
-  pinMode(SCL_Pin, INPUT);
-  */
+  //Disable Internal Pullup Resistors
+  //pinMode(SDA_Pin, INPUT);
+  //pinMode(SCL_Pin, INPUT);
+  
   Wire.onReceive(receiveEvent);
   Wire.onRequest(requestEvent);
   pinMode(13, OUTPUT);
@@ -60,12 +60,21 @@ void setup()
 }
 
 void loop(){
-  delay(1);
+  delay(1000);
+  dir = 'C';
+  //moveAct();
+  stpPort.step(10);
+  stpStar.step(-10);
+  delay(1000);
+  dir = 'O';
+  stpPort.step(-10);
+  stpStar.step(10);
+  //moveAct();
 }
 
-void receiveEvent(){
+void receiveEvent(int howMany){
   while(Wire.available()){
-    dir = Wire.read()
+    dir = Wire.read();
   }
 }
 
@@ -92,35 +101,21 @@ void moveAct(){
   }    
   boolean boolTouchPort = checkPin(tp);
   boolean boolTouchStar = checkPin(ts);
-  while(i<maxStep || (!boolTouchPort && !boolTouchStar)){
+  while(i<maxStep && (!boolTouchPort || !boolTouchStar)){
     boolTouchPort = checkPin(tp);
     boolTouchStar = checkPin(ts);
-    myStp.step(numSteps);
+    stpPort.step(numSteps*dirInd);
+    stpStar.step(-1*numSteps*dirInd);
     i = i + numSteps;
   }
 }
-
-/**openAct*******************************************************
-Code to open actuator flaps
-How you say? I'm not sure yet
-**********************************************************/
-void openAct(){
-}
-
-/**closeAct*******************************************************
-Code to open actuator flaps
-How you say? I'm not sure yet
-**********************************************************/
-void closeAct(){
-}
-
 
 /**checkPin*******************************************************
 Code to open actuator flaps
 How you say? I'm not sure yet
 **********************************************************/
 boolean checkPin(int pin){
-  boolean boolTouchPort;
+  boolean boolTouchPort = false;
   int highThresh = 1024/2;
   int tmpVal = analogRead(pin);
   if (tmpVal <= highThresh){

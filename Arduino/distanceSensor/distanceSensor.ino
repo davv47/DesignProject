@@ -15,13 +15,16 @@ int ledPin = 13;
 void setup(){
   Wire.begin(sdaIndex);           // join i2c bus with address
   
-  /*Disable Internal Pullup Resistors
+  //Disable Internal Pullup Resistors
   pinMode(SDA_Pin, INPUT);
-  pinMode(SCL_Pin, INPUT);  */
+  pinMode(SCL_Pin, INPUT);
   
   Wire.onRequest(requestEvent);
   pinMode(ledPin, OUTPUT);  
   pinMode(sensePin, INPUT);
+  
+  digitalWrite(ledPin, LOW);
+  
 }
 
 void loop(){
@@ -33,10 +36,10 @@ void loop(){
 void requestEvent(){
   int dist = getSenseDist();
   if (dist == 1){
-    Wire.write(1);
+    Wire.write(55);
   }
   else{
-    Wire.write(0);
+    Wire.write(10);
   }
 }
 
