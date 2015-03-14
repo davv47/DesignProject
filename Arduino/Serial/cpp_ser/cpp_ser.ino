@@ -32,7 +32,7 @@ void setup() {
     serInByte[0] == Sensor Signal
 **********************************************************/
 void loop(){
-  if (Serial.available()>0){  
+  //if (Serial.available()>0){  
     int i=0;
     while(Serial.available()>0){
       char tmpC = Serial.read();
@@ -62,10 +62,10 @@ void loop(){
       Wire.write(serInByte[1]);
       Wire.endTransmission();
       Wire.requestFrom(sdaActIndex, 1);
-      while(wire.available()){
+      while(Wire.available()){
         finInd = Wire.read();
       }
-      Serial.write(inInd);
+      Serial.write(finInd);
     }
     //Sensor Signal
     else if (serInByte[0] == 3){
@@ -84,7 +84,7 @@ void loop(){
     else{
       //Serial.println("E");
     }
-  }
+  //}
   delay(1);
 }
 

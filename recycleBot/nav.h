@@ -47,7 +47,7 @@ class nav{
 void nav::startNav(string colour){
     VideoCapture cap(imgPro.webCamNum);
     //imgPro.openWebcam(cap);
-    checkForStop(10000);
+    checkForStop(1000);
     moveToObj(colour, cap);
 }
 
@@ -72,7 +72,7 @@ void nav::moveToObj(string colour, VideoCapture cap){
     //While program not stopped by user
     while (this->loop){
         int loopCount = 0;
-        int loopMax = 1;
+        int loopMax = 3;
         Point objectPT;
         imgPro.capFrame(cap, imgOut, imgOrig, colour);
         if (!imgOrig.empty()){
@@ -114,16 +114,16 @@ void nav::moveToObj(string colour, VideoCapture cap){
             if(x>0){
                 dir = 'R';
                 m1Speed = '1';
-                m2Speed = '1';
+                m2Speed = '0';
                 m1Dir = '1';
                 m2Dir = '1';
             }
             else if (x<0){
                 dir = 'L';
-                m1Speed = '1';
+                m1Speed = '0';
                 m2Speed = '1';
-                m1Dir = '0';
-                m2Dir = '0';
+                m1Dir = '1';
+                m2Dir = '1';
             }
 
             //Send movement Signal to motors
@@ -142,7 +142,7 @@ void nav::moveToObj(string colour, VideoCapture cap){
             }
             if (!(this->loop && loopCount >= loopMax)){
                 sendMove('0', '0', m1Dir, m2Dir);
-                loopCount = 1;
+                loopCount = 0;
                 waitForSlow(1);
             }
             // Output x
@@ -194,18 +194,7 @@ void nav::findObj(string colour, VideoCapture cap){
         //Area is too small--contine looking
         if (area < areaNoObj){
             cout<<"Too Small"<<endl;
-            //Move slightly foreward
-            /*m1Speed = '1';
-            m2Speed = '1';
-            m1Dir = '0';
-            m2Dir = '1';
-            int i;
-            i = 0;
-            while(i<forwardCnt && this->loop){
-                sendMove(m1Speed, m2Speed, m1Dir, m2Dir);
-                sendMove('0', '0', '0', '0');
-                i++;
-            }*/
+
             //Turn Right Slightly
             m1Speed = '1';
             m2Speed = '0';
@@ -279,7 +268,7 @@ void nav::waitForSlow(int waitTime){
     m1Dir = '0';
     m2Dir = '0';
     //Send Signal to motors
-    inBuffer[0] = m1Speed;
+    inBuffer[0] = ;
     inBuffer[1] = m1Dir;
     inBuffer[2] = m2Speed;
     inBuffer[3] = m2Dir;
@@ -313,7 +302,7 @@ void nav::moveLine(int a, char& m1Speed, char& m2Speed, char& m1Dir, char& m2Dir
     case 'F':
         dir = 'F'; //normally 'F' limiting to slow forward
         m1Speed = '1';
-        m1Dir = '0';
+        m1Dir = '1';
         m2Speed = '1';        
         m2Dir = '1';
         cout<<"Fast foreward"<<endl;
@@ -321,7 +310,7 @@ void nav::moveLine(int a, char& m1Speed, char& m2Speed, char& m1Dir, char& m2Dir
     case 'N':
         dir = 'N';
         m1Speed = '1';
-        m1Dir = '0';
+        m1Dir = '1';
         m2Speed = '1';
         m2Dir = '1';
         cout<<"Slow foreward"<<endl;
@@ -329,7 +318,7 @@ void nav::moveLine(int a, char& m1Speed, char& m2Speed, char& m1Dir, char& m2Dir
     case 'B':
         dir = 'B';
         m1Speed = '1';
-        m1Dir = '1';
+        m1Dir = '0';
         m2Speed = '1';
         m2Dir = '0';
         cout<<"Going backward"<<endl;

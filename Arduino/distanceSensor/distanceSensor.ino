@@ -20,8 +20,7 @@ void setup(){
   pinMode(SCL_Pin, INPUT);  */
   
   Wire.onRequest(requestEvent);
-  pinMode(ledPin, OUTPUT);
-  
+  pinMode(ledPin, OUTPUT);  
   pinMode(sensePin, INPUT);
 }
 
@@ -31,7 +30,7 @@ void loop(){
 
 // function that executes whenever data is received from master
 // this function is registered as an event, see setup()
-void requestEvent(int aCount){
+void requestEvent(){
   int dist = getSenseDist();
   if (dist == 1){
     Wire.write(1);
