@@ -34,12 +34,12 @@ void setup() {
 void loop(){
   //if (Serial.available()>0){  
     int i=0;
-    while(Serial.available()>0){
+    /*while(Serial.available()>0){
       char tmpC = Serial.read();
       serInByte[i] = tmpC - '0';
       //Serial.print(tmpC);
       i++;     
-    }
+    }*/
     // Motor Signal
     if (serInByte[0] ==  1){
       for (int i=0; i<4; i++){
@@ -73,18 +73,30 @@ void loop(){
       int goInd;
       //Serial.println("In sensor");
       Wire.beginTransmission(sdaSensorIndex);
-      Wire.requestFrom(sdaSensorIndex, 1);
-      while(Wire.available()){
-        goInd = Wire.read();
+      int avail = Wire.requestFrom(sdaSensorIndex, 2);
+      if(avail == 2){
+        int receivedValue = Wire.read() << 8 | Wire.read();
+        Serial.println(receivedValue);
       }
+      else{
+        Serial.print("Unexpected number of bytes received: ");
+        Serial.println(avail);
+      }
+      /*while(Wire.available()){
+        goInd = Wire.read();
+      }*/
       Wire.endTransmission();
       digitalWrite(ledPin, LOW);      
-      Serial.println(goInd); // write
+      //Serial.println(goInd); // write
     }      
     else{
       //Serial.println("E");
     }
   //}
+<<<<<<< HEAD
   delay(1);
+=======
+  delay(1000);
+>>>>>>> 8f12082e4ac7714e0e8b9ed56629e2c9897eb65b
 }
 
