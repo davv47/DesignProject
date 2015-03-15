@@ -33,6 +33,8 @@ void setup() {
     serInByte[0] == Sensor Signal
 **********************************************************/
 void loop(){
+  delay(5000);
+  Serial.println("In Loop");
   //if (Serial.available()>0){  
     int i=0;
     /*while(Serial.available()>0){
@@ -76,31 +78,29 @@ void loop(){
       Wire.endTransmission();
       digitalWrite(ledPin, LOW);      
       //Serial.println(goInd); // write
-    }      
+    }        
     //Actuator Signal
     else if (serInByte[0] == 4){
       int finInd;
+      int dir;
+      Serial.println("Started");
       Wire.beginTransmission(sdaActIndex);
-      //Send Direction Signal
-      //Wire.write(serInByte[1]);
-      Wire.write('C');
+      dir = 1;
+      Wire.write(dir);
       Wire.endTransmission();
-      Serial.println("Writing Direction");
-      Wire.requestFrom(sdaActIndex, 1);
-      while(Wire.available()){
-        finInd = Wire.read();
-      }
-      Serial.println("Move Finished");
-      Serial.write(finInd);
+      Serial.println("Sent Close");
+      delay(1000);
+      Wire.beginTransmission(sdaActIndex);
+      dir = 0;
+      Wire.write(dir);
+      Wire.endTransmission();
+      Serial.println("Sent Open");
     }
     else{
       //Serial.println("E");
     }
   //}
-<<<<<<< HEAD
-  delay(1);
-=======
+
   delay(1000);
->>>>>>> 8f12082e4ac7714e0e8b9ed56629e2c9897eb65b
 }
 

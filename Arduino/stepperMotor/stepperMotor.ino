@@ -15,15 +15,15 @@ int windPB = 6;//red wire
 int windPC = 2;//green wire
 int windPD = 3;//blue wire
 
-int windSA = A0;//black wire
-int windSB = A1;//red wire
-int windSC = A2;//green wire
-int windSD = A3;//blue wire
+int windSA = 12;//black wire
+int windSB = 11;//red wire
+int windSC = 10;//green wire
+int windSD = 9;//blue wire
 
 int tp = 7;//Changed to Analog Pin
 int ts = 8; //Changed to Analog Pin
 
-char dir;
+int dir;
 
 int stepperMotorSteps = 200;
 
@@ -55,28 +55,19 @@ void setup(){
   pinMode(tp, INPUT);
   pinMode(ts, INPUT);
   
-  stpPort.setSpeed(10); //set motor speed to 30 rpm
-  stpPort.setSpeed(10); //set motor speed to 30 rpm
+  stpPort.setSpeed(5); //set motor speed to 30 rpm
+  stpStar.setSpeed(5); //set motor speed to 30 rpm
 }
 
 void loop(){
-  int steps = 20;
-  delay(1000);
-  dir = 'C';
-  //moveAct();
-  stpPort.step(steps);
-  stpStar.step(-1*steps*);
-  delay(1000);
-  dir = 'O';
-  stpPort.step(-1*steps);
-  stpStar.step(steps);
-  //moveAct();
+  delay(1);
 }
 
 void receiveEvent(int howMany){
   while(Wire.available()){
     dir = Wire.read();
   }
+  moveAct();
 }
 
 void requestEvent(){
@@ -90,21 +81,21 @@ Code to close actuator flaps
 Runs 'till tactile sensors are triggered
 **********************************************************/
 void moveAct(){
-  int maxStep = stepperMotorSteps/4*.8; //80% of 90 degree rurn 
+  int maxStep = 15;//stepperMotorSteps/4*.8; //80% of 90 degree rurn 
   int i = 0;
   int dirInd;
-  int numSteps = 10;
-  if (dir =='C'){
+  int numSteps = 2;
+  if (dir == 1){
     dirInd = 1;
   }
   else{
     dirInd = -1;
   }    
-  boolean boolTouchPort = checkPin(tp);
-  boolean boolTouchStar = checkPin(ts);
-  while(i<maxStep && (!boolTouchPort || !boolTouchStar)){
-    boolTouchPort = checkPin(tp);
-    boolTouchStar = checkPin(ts);
+  boolean boolTouchPort = false; //checkPin(tp);
+  boolean boolTouchStar = false;//checkPin(ts);
+  while(i < maxStep && (!boolTouchPort || !boolTouchStar)){
+    //boolTouchPort = checkPin(tp);
+    //boolTouchStar = checkPin(ts);
     stpPort.step(numSteps*dirInd);
     stpStar.step(-1*numSteps*dirInd);
     i = i + numSteps;
