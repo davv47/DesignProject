@@ -7,8 +7,8 @@ stepper motor number of steps
 #include <Stepper.h>
 
 int sdaIndex =10;
-int SDA_Pin = 2;
-int SCL_Pin = 3;
+int SDA_Pin = A4;
+int SCL_Pin = A5;
 
 int windPA = 5;//black wire
 int windPB = 6;//red wire
@@ -35,8 +35,8 @@ void setup(){
   Wire.begin(sdaIndex);           // join i2c bus with address
   
   //Disable Internal Pullup Resistors
-  //pinMode(SDA_Pin, INPUT);
-  //pinMode(SCL_Pin, INPUT);
+  pinMode(SDA_Pin, INPUT);
+  pinMode(SCL_Pin, INPUT);
   
   Wire.onReceive(receiveEvent);
   Wire.onRequest(requestEvent);

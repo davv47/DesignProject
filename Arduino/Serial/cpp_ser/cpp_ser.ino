@@ -82,11 +82,12 @@ void loop(){
     //Actuator Signal
     else if (serInByte[0] == 4){
       int finInd;
-      int dir;
-      Serial.println("Started");
+      int dir;      
       Wire.beginTransmission(sdaActIndex);
+      Serial.println("Started");
       dir = 1;
       Wire.write(dir);
+      Serial.println("Written");
       Wire.endTransmission();
       Serial.println("Sent Close");
       delay(1000);
