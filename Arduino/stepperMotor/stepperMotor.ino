@@ -4,7 +4,7 @@ stepper motor number of steps
 *****************************************/
 
 #include <Wire.h>
-#include <Stepper.h>
+//#include <Stepper.h>
 
 int sdaIndex =10;
 int SDA_Pin = A4;
@@ -20,6 +20,8 @@ int windSB = 11;//red wire
 int windSC = 10;//green wire
 int windSD = 9;//blue wire
 
+int delaySpeed = 5;
+
 int tp = 7;//Changed to Analog Pin
 int ts = 8; //Changed to Analog Pin
 
@@ -28,8 +30,8 @@ int dir;
 int stepperMotorSteps = 200;
 
 //200 step stepper motor
-Stepper stpPort = Stepper(stepperMotorSteps, windPA, windPC, windPB, windPD);
-Stepper stpStar = Stepper(stepperMotorSteps, windSA, windSC, windSB, windSD);
+//Stepper stpPort = Stepper(stepperMotorSteps, windPA, windPC, windPB, windPD);
+//Stepper stpStar = Stepper(stepperMotorSteps, windSA, windSC, windSB, windSD);
 
 void setup(){
   Wire.begin(sdaIndex);           // join i2c bus with address
@@ -55,12 +57,16 @@ void setup(){
   pinMode(tp, INPUT);
   pinMode(ts, INPUT);
   
-  stpPort.setSpeed(5); //set motor speed to 30 rpm
-  stpStar.setSpeed(5); //set motor speed to 30 rpm
+  //stpPort.setSpeed(5); //set motor speed to 30 rpm
+  //stpStar.setSpeed(5); //set motor speed to 30 rpm
 }
 
 void loop(){
-  delay(1);
+  moveHalfStep(1, 1);
+  delay(1000);
+  moveHalfStep(1, -1);
+  delay(1000);
+  
 }
 
 void receiveEvent(int howMany){
@@ -96,8 +102,9 @@ void moveAct(){
   while(i < maxStep && (!boolTouchPort || !boolTouchStar)){
     //boolTouchPort = checkPin(tp);
     //boolTouchStar = checkPin(ts);
-    stpPort.step(numSteps*dirInd);
-    stpStar.step(-1*numSteps*dirInd);
+    //stpPort.step(numSteps*dirInd);
+    //stpStar.step(-1*numSteps*dirInd);    
+    moveHalfStep(1, dirInd);
     i = i + numSteps;
   }
 }
@@ -117,4 +124,83 @@ boolean checkPin(int pin){
     boolTouchPort = true;
   }
   return boolTouchPort;
+}
+
+/**moveHalfStep*******************************************************
+half step movement form stepper motor
+**********************************************************/
+void moveHalfStep(int steps, int dir){
+  for(int j = 0; j<steps; j++){
+    if (dir ==1){
+      for(int i = 0;i < 8; i++){
+         stepSeq(i, windPA, windPB, windPC, windPD);
+         stepSeq(8-i, windSA, windSB, windSC, windSD);
+         delay(delaySpeed);
+      }
+    }
+    else{
+     for(int i = 8;i > 0; i--){
+         stepSeq(8-i, windPA, windPB, windPC, windPD);
+         stepSeq(8, windSA, windSB, windSC, windSD);
+       delay(delaySpeed);
+     }
+    }
+  }
+  
+}
+
+
+/**stepSeq*******************************************************
+Code written by Justin Royce to move stepper motors
+**********************************************************/
+void stepSeq(int stepNumber, int windA, int windB, int windC, int windD){
+  
+  if(stepNumber == 0x00){
+    digitalWrite(windA,HIGH);
+    digitalWrite(windB,LOW);
+    digitalWrite(windC,LOW);
+    digitalWrite(windD,HIGH);
+  }
+  if(stepNumber == 0x01){
+    digitalWrite(windA,HIGH);
+    digitalWrite(windB,LOW);
+    digitalWrite(windC,LOW);
+    digitalWrite(windD,LOW);
+  }
+  if(stepNumber == 0x02){
+    digitalWrite(windA,HIGH);
+    digitalWrite(windB,HIGH);
+    digitalWrite(windC,LOW);
+    digitalWrite(windD,LOW);
+  }
+  if(stepNumber == 0x03){
+    digitalWrite(windA,LOW);
+    digitalWrite(windB,HIGH);
+    digitalWrite(windC,LOW);
+    digitalWrite(windD,LOW);
+  }
+  if(stepNumber == 0x04){
+    digitalWrite(windA,LOW);
+    digitalWrite(windB,HIGH);
+    digitalWrite(windC,HIGH);
+    digitalWrite(windD,LOW);
+  }
+  if(stepNumber == 0x05){
+    digitalWrite(windA,LOW);
+    digitalWrite(windB,LOW);
+    digitalWrite(windC,HIGH);
+    digitalWrite(windD,LOW);
+  }
+  if(stepNumber == 0x06){
+    digitalWrite(windA,LOW);
+    digitalWrite(windB,LOW);
+    digitalWrite(windC,HIGH);
+    digitalWrite(windD,HIGH);
+  }
+  if(stepNumber == 0x07){
+    digitalWrite(windA,LOW);
+    digitalWrite(windB,LOW);
+    digitalWrite(windC,LOW);
+    digitalWrite(windD,HIGH);
+  }
 }
