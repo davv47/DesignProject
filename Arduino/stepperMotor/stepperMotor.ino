@@ -20,7 +20,7 @@ int windSB = 11;//red wire
 int windSC = 10;//green wire
 int windSD = 9;//blue wire
 
-int delaySpeed = 5;
+int delaySpeed = 20;
 
 int tp = 7;//Changed to Analog Pin
 int ts = 8; //Changed to Analog Pin
@@ -62,10 +62,11 @@ void setup(){
 }
 
 void loop(){
-  moveHalfStep(1, 1);
+  /*moveHalfStep(1, 1);
   delay(1000);
   moveHalfStep(1, -1);
-  delay(1000);
+  delay(1000);*/
+  delay(1);
   
 }
 
@@ -131,7 +132,7 @@ half step movement form stepper motor
 **********************************************************/
 void moveHalfStep(int steps, int dir){
   for(int j = 0; j<steps; j++){
-    if (dir ==1){
+    if (dir == 1){
       for(int i = 0;i < 8; i++){
          stepSeq(i, windPA, windPB, windPC, windPD);
          stepSeq(8-i, windSA, windSB, windSC, windSD);
@@ -139,7 +140,7 @@ void moveHalfStep(int steps, int dir){
       }
     }
     else{
-     for(int i = 8;i > 0; i--){
+     for(int i = 0;i < 8; i++){
          stepSeq(8-i, windPA, windPB, windPC, windPD);
          stepSeq(8, windSA, windSB, windSC, windSD);
        delay(delaySpeed);

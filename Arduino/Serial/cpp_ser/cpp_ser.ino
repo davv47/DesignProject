@@ -17,7 +17,6 @@ void setup() {
   //pinMode(SDA_Pin, INPUT);
   //pinMode(SCL_Pin, INPUT);
   pinMode(ledPin, OUTPUT);
-  serInByte[0] = 4;
   
 }
 /*********************************************************
@@ -33,16 +32,15 @@ void setup() {
     serInByte[0] == Sensor Signal
 **********************************************************/
 void loop(){
-  delay(5000);
-  Serial.println("In Loop");
-  //if (Serial.available()>0){  
+  if (Serial.available()>0){  
     int i=0;
-    /*while(Serial.available()>0){
+    while(Serial.available()>0){
       char tmpC = Serial.read();
       serInByte[i] = tmpC - '0';
       //Serial.print(tmpC);
       i++;     
-    }*/
+    }
+    
     // Motor Signal
     if (serInByte[0] ==  1){
       for (int i=0; i<4; i++){
@@ -57,51 +55,58 @@ void loop(){
       Wire.endTransmission();
       
     }
+    
     //Sensor Signal
     else if (serInByte[0] == 3){
       digitalWrite(ledPin, HIGH);
-      byte goInd;
+      int goInd;
       //Serial.println("In sensor");
       Wire.beginTransmission(sdaSensorIndex);
       int avail = Wire.requestFrom(sdaSensorIndex, 2);
       if(avail == 2){
-        int receivedValue = Wire.read() << 8 | Wire.read();
-        Serial.println(receivedValue);
+        goInd = Wire.read();
+        //Serial.println(goInd);
       }
       else{
-        Serial.print("Unexpected number of bytes received: ");
-        Serial.println(avail);
+        //Serial.print("Unexpected number of bytes received: ");
+        //Serial.println(avail);
       }
-      /*while(Wire.available()){
-        goInd = Wire.read();
-      }*/
       Wire.endTransmission();
-      digitalWrite(ledPin, LOW);      
-      //Serial.println(goInd); // write
+      digitalWrite(ledPin, LOW);
+      int tmpWrite;
+      //Stop moving Forward
+      if (goInd == 1){      
+        tmpWrite = 10;
+      }
+      //Move forward
+      else{
+        tmpWrite = 55;
+      }
+      Serial.println(tmpWrite); // write to serialstream
     }        
+    
     //Actuator Signal
     else if (serInByte[0] == 4){
       int finInd;
       int dir;      
       Wire.beginTransmission(sdaActIndex);
-      Serial.println("Started");
+      //Serial.println("Started");
       dir = 1;
       Wire.write(dir);
-      Serial.println("Written");
+      //Serial.println("Written");
       Wire.endTransmission();
-      Serial.println("Sent Close");
+      //Serial.println("Sent Close");
       delay(1000);
       Wire.beginTransmission(sdaActIndex);
       dir = 0;
       Wire.write(dir);
       Wire.endTransmission();
-      Serial.println("Sent Open");
+      //Serial.println("Sent Open");
     }
     else{
       //Serial.println("E");
     }
-  //}
-
-  delay(1000);
+  }
+  delay(10);
 }
 

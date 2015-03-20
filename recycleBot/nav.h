@@ -39,6 +39,7 @@ class nav{
     void checkForStop(int);
     void sendMove(char, char, char, char);
     void stopMovement();
+    void stepperMotor();
 };
 
 /*startMove********************************************************************
@@ -228,26 +229,44 @@ void nav::findObj(string colour, VideoCapture cap){
  * fine approach using sensor
  * ***************************************************************************/
 void nav::closeMove(){
-    char senseData;
+    char str[2];
     loop = true;
+    char m1Speed = '1';
+    char m1Dir = '1';
+    char m2Speed = '1';
+    char m2Dir = '1';
+
     while(loop){
 
         inBuffer[0] = '3';
         inBuffer[1] = 'X';
         inBuffer[2] = 'X';
         inBuffer[3] = 'X';
-        cout<<"Attempting to Write: "<<inBuffer[0]<<endl;
         //Open Serial Port
         ser.open();
-        cout<<"Port Open"<<endl;
         //Send data
         ardu.write(inBuffer, BUFFER_SIZE);
         //Read Response
-        cout<<"Data sent, waiting for Response"<<endl;
-        ardu>>senseData;
+        ardu>>str;
         //close Serial Port
         ardu.Close();
-        cout<<"Port Closed, got data: "<<atoi(&senseData)<<endl;
+        cout<<str<<endl;
+
+        //Move forward a bit more
+        if (str == "55"){
+            sendMove(m1Speed, m2Speed, m1Dir, m2Dir);
+            waitForSlow(waitTime);
+        }
+        //End of step forward
+        else if(str == "10"){
+            waitForSlow(waitTime);
+            loop = false;
+        }
+        //Error
+        else{
+            waitForSlow(waitTime);
+        }
+
     }
 }
 
@@ -268,7 +287,7 @@ void nav::waitForSlow(int waitTime){
     m1Dir = '0';
     m2Dir = '0';
     //Send Signal to motors
-    inBuffer[0] = ;
+    inBuffer[0] = m1Speed;
     inBuffer[1] = m1Dir;
     inBuffer[2] = m2Speed;
     inBuffer[3] = m2Dir;

@@ -36,10 +36,10 @@ void loop(){
 void requestEvent(){
   int dist = getSenseDist();
   if (dist == 1){
-    Wire.write(55);
+    Wire.write(1); //Done Moving Towards object
   }
   else{
-    Wire.write(10);
+    Wire.write(0); //Move Towards Object
   }
 }
 
@@ -50,12 +50,13 @@ int getSenseDist(){
   int senseVals = 10;
   int val = 0;
   byte ind;
-  int valThresh = 450;
+  int valThresh = 350;
   for (int i=0; i<senseVals; i++){
     val = val + analogRead(A2);
     delay(1);
   }
   val = val/senseVals;
+  //Close to object
   if (val>valThresh){
     val = 1;
   }
