@@ -21,9 +21,9 @@ serialCom ser;
 
 int main(){
     nav run;
-    /*string colour = "red";
+    run.hasObj = false;
+    string colour = "red";
     waitKey(10000);
-    run.startNav(colour);*/
-    run.closeMove();
+    run.startNav(colour);
 }
 

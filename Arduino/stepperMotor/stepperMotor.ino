@@ -20,7 +20,7 @@ int windSB = 11;//red wire
 int windSC = 10;//green wire
 int windSD = 9;//blue wire
 
-int delaySpeed = 20;
+int delaySpeed = 100;
 
 int tp = 7;//Changed to Analog Pin
 int ts = 8; //Changed to Analog Pin
@@ -92,6 +92,7 @@ void moveAct(){
   int i = 0;
   int dirInd;
   int numSteps = 2;
+  int numHalfSteps = 2;
   if (dir == 1){
     dirInd = 1;
   }
@@ -105,7 +106,7 @@ void moveAct(){
     //boolTouchStar = checkPin(ts);
     //stpPort.step(numSteps*dirInd);
     //stpStar.step(-1*numSteps*dirInd);    
-    moveHalfStep(1, dirInd);
+    moveHalfStep(numHalfSteps, dirInd);
     i = i + numSteps;
   }
 }

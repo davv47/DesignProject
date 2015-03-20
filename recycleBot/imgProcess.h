@@ -25,8 +25,8 @@ class imgProcess{
 
 imgProcess::imgProcess(){
     webCamNum = 1;
-    xRez = 640/2;
-    yRez = 480/2;
+    xRez = 640;//2;
+    yRez = 480;//2;
 }
 
 void imgProcess::openWebcam(VideoCapture& cap){

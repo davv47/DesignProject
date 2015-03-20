@@ -52,8 +52,7 @@ void loop(){
       for(int i=0; i<4; i++){
         Wire.write(serInByte[i]);
       }
-      Wire.endTransmission();
-      
+      Wire.endTransmission();      
     }
     
     //Sensor Signal
@@ -88,25 +87,18 @@ void loop(){
     //Actuator Signal
     else if (serInByte[0] == 4){
       int finInd;
-      int dir;      
+      int dir = serInByte[1];      
       Wire.beginTransmission(sdaActIndex);
       //Serial.println("Started");
       dir = 1;
       Wire.write(dir);
       //Serial.println("Written");
       Wire.endTransmission();
-      //Serial.println("Sent Close");
-      delay(1000);
-      Wire.beginTransmission(sdaActIndex);
-      dir = 0;
-      Wire.write(dir);
-      Wire.endTransmission();
-      //Serial.println("Sent Open");
     }
     else{
       //Serial.println("E");
     }
   }
-  delay(10);
+  delay(1);
 }
 

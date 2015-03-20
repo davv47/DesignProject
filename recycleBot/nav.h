@@ -25,6 +25,7 @@ class nav{
     imgProcess imgPro;
     int waitTime;
     bool loop;
+    bool hasObj;
     Mat imgOrig, imgOut;
     const char* imgFindObj = "findObj";
     const char* imgMoveToObj = "moveToObj";
@@ -32,14 +33,14 @@ class nav{
     void startNav(string);
     void moveToObj(string, VideoCapture);
     void findObj(string, VideoCapture);
-    void closeMove();
+    void closeMove(string);
 
     void waitForSlow(int);
     void moveLine(int, char&, char&, char&, char&, char&);
     void checkForStop(int);
     void sendMove(char, char, char, char);
     void stopMovement();
-    void stepperMotor();
+    void stepperMotor(char, string);
 };
 
 /*startMove********************************************************************
@@ -71,9 +72,9 @@ void nav::moveToObj(string colour, VideoCapture cap){
     namedWindow(imgMoveToObj, CV_WINDOW_AUTOSIZE);
 
     //While program not stopped by user
+    int loopCount = 0;
+    int loopMax = 3;
     while (this->loop){
-        int loopCount = 0;
-        int loopMax = 3;
         Point objectPT;
         imgPro.capFrame(cap, imgOut, imgOrig, colour);
         if (!imgOrig.empty()){
@@ -114,15 +115,15 @@ void nav::moveToObj(string colour, VideoCapture cap){
             // If in left of frame move motors Dir 1
             if(x>0){
                 dir = 'R';
-                m1Speed = '1';
-                m2Speed = '0';
+                m1Speed = '0';
+                m2Speed = '1';
                 m1Dir = '1';
                 m2Dir = '1';
             }
             else if (x<0){
                 dir = 'L';
-                m1Speed = '0';
-                m2Speed = '1';
+                m1Speed = '1';
+                m2Speed = '0';
                 m1Dir = '1';
                 m2Dir = '1';
             }
@@ -138,13 +139,20 @@ void nav::moveToObj(string colour, VideoCapture cap){
             if (dir =='R' || dir == 'L' || dir == 'B' || dir == 'N'){
                 stepDir = true;
             }
+            else if (dir == 'S'){
+                cout<<"Stopped->Finding Object"<<endl;
+                cvDestroyWindow(imgMoveToObj);
+                waitForSlow(500);
+                closeMove(colour);
+                loop = false;
+            }
             if (!stepDir){
                 loopCount = loopMax;
             }
             if (!(this->loop && loopCount >= loopMax)){
                 sendMove('0', '0', m1Dir, m2Dir);
                 loopCount = 0;
-                waitForSlow(1);
+                waitForSlow(500);
             }
             // Output x
             cout<<"x is: "<<x<<" Area is: "<<area<<endl;
@@ -228,9 +236,10 @@ void nav::findObj(string colour, VideoCapture cap){
 /*closeMove********************************************************************
  * fine approach using sensor
  * ***************************************************************************/
-void nav::closeMove(){
+void nav::closeMove(string colour){
     char str[2];
     loop = true;
+    waitTime = 5;
     char m1Speed = '1';
     char m1Dir = '1';
     char m2Speed = '1';
@@ -253,17 +262,20 @@ void nav::closeMove(){
         cout<<str<<endl;
 
         //Move forward a bit more
-        if (str == "55"){
+        if (strcmp("55", str) == 0){
             sendMove(m1Speed, m2Speed, m1Dir, m2Dir);
             waitForSlow(waitTime);
         }
         //End of step forward
-        else if(str == "10"){
+        else if(strcmp("10", str) == 0){
+            cout<<"Got to object"<<endl;
             waitForSlow(waitTime);
+            stepperMotor('1', colour);
             loop = false;
         }
         //Error
         else{
+            cout<<"in error :("<<endl;
             waitForSlow(waitTime);
         }
 
@@ -273,8 +285,21 @@ void nav::closeMove(){
 /*stepperMotor********************************************************************
  * fine approach using sensor
  * ***************************************************************************/
-void nav::stepperMotor(){
-
+void nav::stepperMotor(char dir, string colour){
+    loop = true;
+    waitTime = 5;
+    inBuffer[0] = '4';
+    inBuffer[1] = dir;
+    inBuffer[2] = 'X';
+    inBuffer[3] = 'X';
+    //Open Serial Port
+    ser.open();
+    //Send data
+    ardu.write(inBuffer, BUFFER_SIZE);
+    //close Serial Port
+    ardu.Close();
+    startNav(colour);
+    loop = false;
 }
 
 /*waitForSlow********************************************************************
