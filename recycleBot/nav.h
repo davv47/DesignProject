@@ -24,6 +24,7 @@ class nav{
     serialCom ser;
     imgProcess imgPro;
     int waitTime;
+    int longWaitTime;
     bool loop;
     bool hasObj;
     Mat imgOrig, imgOut;
@@ -66,7 +67,8 @@ void nav::moveToObj(string colour, VideoCapture cap){
     char dir, lastDir;
     int deadX = 50;
     int areaNoObj = 300;
-    waitTime = 3;
+    waitTime = 2;
+    longWaitTime = 10;
     this->loop = true;
 
     namedWindow(imgMoveToObj, CV_WINDOW_AUTOSIZE);
@@ -142,7 +144,7 @@ void nav::moveToObj(string colour, VideoCapture cap){
             else if (dir == 'S'){
                 cout<<"Stopped->Finding Object"<<endl;
                 cvDestroyWindow(imgMoveToObj);
-                waitForSlow(500);
+                waitForSlow(longWaitTime);
                 closeMove(colour);
                 loop = false;
             }
@@ -152,7 +154,7 @@ void nav::moveToObj(string colour, VideoCapture cap){
             if (!(this->loop && loopCount >= loopMax)){
                 sendMove('0', '0', m1Dir, m2Dir);
                 loopCount = 0;
-                waitForSlow(500);
+                waitForSlow(longWaitTime);
             }
             // Output x
             cout<<"x is: "<<x<<" Area is: "<<area<<endl;
@@ -180,7 +182,8 @@ void nav::findObj(string colour, VideoCapture cap){
     int forwardCnt = 10;
     int turnCnt = 3;
     int areaNoObj = 100;
-    waitTime = 5;
+    waitTime = 2;
+    longWaitTime = 10;
     this->loop = true;
     namedWindow(imgFindObj, CV_WINDOW_AUTOSIZE);
     while(this->loop){
@@ -212,7 +215,7 @@ void nav::findObj(string colour, VideoCapture cap){
             //i = 0;
             sendMove(m1Speed, m2Speed, m1Dir, m2Dir);
             if (!(this->loop && loopCount >= loopMax)){
-                waitForSlow(500);
+                waitForSlow(longWaitTime);
                 loopCount = 0;
             }
             loopCount++;
@@ -239,7 +242,8 @@ void nav::findObj(string colour, VideoCapture cap){
 void nav::closeMove(string colour){
     char str[2];
     loop = true;
-    waitTime = 5;
+    waitTime = 2;
+    longWaitTime = 10;
     char m1Speed = '1';
     char m1Dir = '1';
     char m2Speed = '1';
@@ -264,19 +268,19 @@ void nav::closeMove(string colour){
         //Move forward a bit more
         if (strcmp("55", str) == 0){
             sendMove(m1Speed, m2Speed, m1Dir, m2Dir);
-            waitForSlow(waitTime);
+            waitForSlow(longWaitTime);
         }
         //End of step forward
         else if(strcmp("10", str) == 0){
             cout<<"Got to object"<<endl;
-            waitForSlow(waitTime);
+            waitForSlow(longWaitTime);
             stepperMotor('1', colour);
             loop = false;
         }
         //Error
         else{
             cout<<"in error :("<<endl;
-            waitForSlow(waitTime);
+            waitForSlow(longWaitTime);
         }
 
     }
