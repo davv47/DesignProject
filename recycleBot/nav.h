@@ -68,14 +68,14 @@ void nav::moveToObj(string colour, VideoCapture cap){
     int deadX = 50;
     int areaNoObj = 300;
     waitTime = 2;
-    longWaitTime = 10;
+    longWaitTime = 1000;
     this->loop = true;
 
     namedWindow(imgMoveToObj, CV_WINDOW_AUTOSIZE);
 
     //While program not stopped by user
     int loopCount = 0;
-    int loopMax = 3;
+    int loopMax = 2;
     while (this->loop){
         Point objectPT;
         imgPro.capFrame(cap, imgOut, imgOrig, colour);
@@ -148,10 +148,10 @@ void nav::moveToObj(string colour, VideoCapture cap){
                 closeMove(colour);
                 loop = false;
             }
-            if (!stepDir){
+            if (stepDir){
                 loopCount = loopMax;
             }
-            if (!(this->loop && loopCount >= loopMax)){
+            if (!loop && (loopCount >= loopMax)){
                 sendMove('0', '0', m1Dir, m2Dir);
                 loopCount = 0;
                 waitForSlow(longWaitTime);
@@ -175,7 +175,7 @@ void nav::findObj(string colour, VideoCapture cap){
 
     //Get centroid of object
     int loopCount = 0;
-    int loopMax = 3;
+    int loopMax = 1;
 
     Rect rect;
     char m1Speed, m2Speed, m1Dir, m2Dir;
@@ -309,7 +309,7 @@ void nav::stepperMotor(char dir, string colour){
 /*waitForSlow********************************************************************
  * Delay changing directions (do not blow motors)
  * ***************************************************************************/
-void nav::waitForSlow(int waitTime){
+void nav::waitForSlow(int t){
     char m1Speed, m2Speed, m1Dir, m2Dir;
     m1Speed = '0';
     m2Speed = '0';
@@ -326,7 +326,7 @@ void nav::waitForSlow(int waitTime){
     ardu.write(inBuffer, BUFFER_SIZE);
     //close Serial Port
     ardu.Close();
-    checkForStop(waitTime);
+    checkForStop(t);
 }
 
 /*moveLine********************************************************************
@@ -418,7 +418,7 @@ void nav::sendMove(char m1Speed, char m2Speed, char m1Dir, char m2Dir){
     ardu.Close();
     //Delay to account for small move & check for end program signal
     checkForStop(waitTime);
-    cout<<inBuffer<<endl;
+    cout<<inBuffer<<" "<<waitTime<<endl;
 }
 
 /*stopMovement********************************************************************
