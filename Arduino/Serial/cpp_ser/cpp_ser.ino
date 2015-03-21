@@ -14,8 +14,6 @@ void setup() {
   Wire.begin(sdaMotorIndex);
   Wire.begin(sdaSensorIndex);
   Wire.begin(sdaActIndex);
-  //pinMode(SDA_Pin, INPUT);
-  //pinMode(SCL_Pin, INPUT);
   pinMode(ledPin, OUTPUT);
   
 }

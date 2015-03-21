@@ -3,7 +3,7 @@
 #include <iostream>
 #include <string.h>
 #include <SerialStream.h>
-#define PORT "/dev/ttyACM0" //Arduinio Device
+#define PORT "/dev/ttyACM1" //Arduinio Device
 
 using namespace std;
 using namespace LibSerial;

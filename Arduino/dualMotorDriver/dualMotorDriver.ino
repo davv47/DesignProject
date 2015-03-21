@@ -73,9 +73,9 @@ void receiveEvent(int howMany){
 }
 
 void moveMotors(){
-
-    M1Speed = serInByte[0]*255/10;
-    M2Speed = serInByte[2]*255/10;
+    // Set Motor Speeds
+    M1Speed = serInByte[0]*255/10*1;
+    M2Speed = serInByte[2]*255/10*1.1;
     
     //M1Dir
     if(serInByte[1] == 0){
@@ -102,23 +102,14 @@ void moveMotors(){
   digitalWrite(inA2, inA2Val);
   digitalWrite(inB1, inB2Val);  
   digitalWrite(inB2, inB1Val); 
-  // output pwm to move wheel  
   
+  // output pwm to move wheel  
   analogWrite(M1PWM, M1Speed);
   analogWrite(M2PWM, M2Speed);
-  
-  // Read current
-  /*
-  if(0){
-    currentVal = analogRead(currentPin);
-    Serial.print("M1 speed =");
-    Serial.print(M1Speed);
-    Serial.print("\t M2 speed =");
-    Serial.print(M2Speed);
-    Serial.print("\t Current = ");
-    Serial.println(currentVal);
-  }
-  */
+  delay(1200);
+  analogWrite(M1PWM, 0);
+  analogWrite(M2PWM, 0);
+
 }
 
 

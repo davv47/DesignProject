@@ -68,14 +68,14 @@ void nav::moveToObj(string colour, VideoCapture cap){
     int deadX = 50;
     int areaNoObj = 300;
     waitTime = 2;
-    longWaitTime = 1000;
+    longWaitTime = 10;
     this->loop = true;
 
     namedWindow(imgMoveToObj, CV_WINDOW_AUTOSIZE);
 
     //While program not stopped by user
     int loopCount = 0;
-    int loopMax = 2;
+    int loopMax = 3;
     while (this->loop){
         Point objectPT;
         imgPro.capFrame(cap, imgOut, imgOrig, colour);
@@ -117,10 +117,10 @@ void nav::moveToObj(string colour, VideoCapture cap){
             // If in left of frame move motors Dir 1
             if(x>0){
                 dir = 'R';
-                m1Speed = '0';
-                m2Speed = '1';
-                m1Dir = '1';
-                m2Dir = '1';
+                m1Speed = '1';
+                m2Speed = '0';
+                m1Dir = '0';
+                m2Dir = '0';
             }
             else if (x<0){
                 dir = 'L';
@@ -148,17 +148,17 @@ void nav::moveToObj(string colour, VideoCapture cap){
                 closeMove(colour);
                 loop = false;
             }
+            /*
             if (stepDir){
                 loopCount = loopMax;
-            }
-            if (!loop && (loopCount >= loopMax)){
-                sendMove('0', '0', m1Dir, m2Dir);
+            }*/
+            if (loop && (stepDir || loopCount == loopMax)){
                 loopCount = 0;
-                waitForSlow(longWaitTime);
+                waitForSlow(waitTime);
             }
             // Output x
-            cout<<"x is: "<<x<<" Area is: "<<area<<endl;
-            cout<<inBuffer<<endl;
+            cout<<"dir is: "<<dir<<" x is: "<<x<<" Area is: "<<area<<" stepDir is: "<< stepDir<<endl;
+            //cout<<inBuffer<<endl;
             loopCount++;
             lastDir = dir;
         }
@@ -214,8 +214,8 @@ void nav::findObj(string colour, VideoCapture cap){
             m2Dir = '1';
             //i = 0;
             sendMove(m1Speed, m2Speed, m1Dir, m2Dir);
-            if (!(this->loop && loopCount >= loopMax)){
-                waitForSlow(longWaitTime);
+            if (loop && loopCount >= loopMax){
+                waitForSlow(waitTime);
                 loopCount = 0;
             }
             loopCount++;
@@ -243,7 +243,7 @@ void nav::closeMove(string colour){
     char str[2];
     loop = true;
     waitTime = 2;
-    longWaitTime = 10;
+    longWaitTime = 100;
     char m1Speed = '1';
     char m1Dir = '1';
     char m2Speed = '1';
@@ -326,7 +326,8 @@ void nav::waitForSlow(int t){
     ardu.write(inBuffer, BUFFER_SIZE);
     //close Serial Port
     ardu.Close();
-    checkForStop(t);
+    cout<<"Wait For Slow: "<<inBuffer<<endl;
+    checkForStop(t);    
 }
 
 /*moveLine********************************************************************
@@ -418,7 +419,7 @@ void nav::sendMove(char m1Speed, char m2Speed, char m1Dir, char m2Dir){
     ardu.Close();
     //Delay to account for small move & check for end program signal
     checkForStop(waitTime);
-    cout<<inBuffer<<" "<<waitTime<<endl;
+    cout<<"Send Move: "<<inBuffer<<" "<<waitTime<<endl;
 }
 
 /*stopMovement********************************************************************
