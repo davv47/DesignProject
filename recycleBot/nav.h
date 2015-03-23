@@ -27,6 +27,7 @@ class nav{
     int longWaitTime;
     bool loop;
     bool hasObj;
+    char actDir;
     Mat imgOrig, imgOut;
     const char* imgFindObj;
     const char* imgMoveToObj;
@@ -34,14 +35,15 @@ class nav{
     void startNav(string);
     void moveToObj(string, VideoCapture);
     void findObj(string, VideoCapture);
-    void closeMove(string);
+    void closeMoveObj(string);
+    void closeMovePile(string, VideoCapture);
 
     void waitForSlow(int);
     void moveLine(int, char&, char&, char&, char&, char&);
     void checkForStop(int);
     void sendMove(char, char, char, char);
     void stopMovement();
-    void stepperMotor(char, string);
+    void stepperMotor(string);
 };
 
 #endif // NAV_H

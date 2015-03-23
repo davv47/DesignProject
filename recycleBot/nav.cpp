@@ -121,8 +121,17 @@ void nav::moveToObj(string colour, VideoCapture cap){
             }
             else if (dir == 'S'){
                 cout<<"Stopped->Finding Object"<<endl;
-                cvDestroyWindow(imgMoveToObj);
-                closeMove(colour);
+                cvDestroyWindow(imgMoveToObj);                
+                if (!hasObj){   //If there isnt a object in the actuator, close it
+                    actDir = '1';
+                    closeMoveObj(colour);
+                    hasObj = true;
+                }
+                else{
+                    actDir = '0';
+                    closeMovePile(colour, cap);
+                    hasObj = false;
+                }
                 loop = false;
             }
             /*
@@ -213,10 +222,10 @@ void nav::findObj(string colour, VideoCapture cap){
     //cvDestroyWindow(imgFindObj);
 }
 
-/*closeMove********************************************************************
+/*closeMoveObj********************************************************************
  * fine approach using sensor
  * ***************************************************************************/
-void nav::closeMove(string colour){
+void nav::closeMoveObj(string colour){
     waitForSlow(500);
     char str[2];
     loop = true;
@@ -227,7 +236,6 @@ void nav::closeMove(string colour){
     char m2Speed = '1';
     char m2Dir = '1';
     int count10;
-    char actDir;
 
     while(loop){
 
@@ -256,15 +264,7 @@ void nav::closeMove(string colour){
             if(count10 >= 10){
                 cout<<"Got to object"<<endl;
                 waitForSlow(longWaitTime);
-                if (!hasObj){   //If there isnt a object in the actuator, close it
-                    actDir = '1';
-                    hasObj = false;
-                }
-                else{
-                    actDir = '0';
-                    hasObj = true;
-                }
-                stepperMotor(actDir, colour);
+                stepperMotor(colour);
                 loop = false;
             }
             else{
@@ -282,15 +282,66 @@ void nav::closeMove(string colour){
     }
 }
 
+/*closeMovePile********************************************************************
+ * fine approach using sensor
+ * ***************************************************************************/
+void nav::closeMovePile(string colour, VideoCapture cap){
+    waitForSlow(500);
+    //VideoCapture cap(imgPro.webCamNum);
+    imgPro.openWebcam(cap);
+
+    //Get centroid of object
+    Rect rect;
+    char m1Speed = '1';
+    char m1Dir = '1';
+    char m2Speed = '1';
+    char m2Dir = '1';
+
+    int areaDropOff = 15000;
+    waitTime = 2;
+    longWaitTime = 100;
+    this->loop = true;
+
+    namedWindow(imgMoveToObj, CV_WINDOW_AUTOSIZE);
+
+    //While program not stopped by user
+    while (this->loop){
+        Point objectPT;
+        imgPro.capFrame(cap, imgOut, imgOrig, colour);
+        if (!imgOrig.empty()){
+            imshow(imgMoveToObj, imgOrig);
+            checkForStop(1);
+        }
+        //imshow("imgBW", imgOut);
+        //Point objectPT = objGeo.centre(imgBW);
+        objRecongition objRec;
+        objRec.getBound2(imgOut, imgOrig, objectPT, rect);
+        objRec.showCentre(imgOrig, objectPT);
+
+        geometry geo;
+        int area = geo.sizeLargest(imgOut, rect);
+        if (area > areaDropOff){
+            cout<<"Got to Pile"<<endl;
+            waitForSlow(longWaitTime);
+            stepperMotor(colour);
+            loop = false;
+        }
+        else{
+            sendMove(m1Speed, m2Speed, m1Dir, m2Dir);
+            waitForSlow(longWaitTime);
+        }
+    }
+}
+
 /*stepperMotor********************************************************************
  * fine approach using sensor
  * ***************************************************************************/
-void nav::stepperMotor(char dir, string colour){
+void nav::stepperMotor(string colour){
     waitForSlow(500);
     loop = true;
     waitTime = 5;
     inBuffer[0] = '4';
-    inBuffer[1] = dir;
+    inBuffer[1] = actDir;
     inBuffer[2] = 'X';
     inBuffer[3] = 'X';
     //Open Serial Port

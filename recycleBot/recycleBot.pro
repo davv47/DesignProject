@@ -10,7 +10,6 @@ SOURCES += main.cpp \
     nav.cpp \
     objRecognition.cpp \
     serialCom.cpp
-
 HEADERS += \
     morphology.h \
     objRecognition.h \
