@@ -3,18 +3,19 @@ CONFIG += console
 CONFIG -= app_bundle
 CONFIG -= qt
 
-SOURCES += main.cpp
+SOURCES += main.cpp \
+    geometry.cpp \
+    imgProcess.cpp \
+    morphology.cpp \
+    nav.cpp \
+    objRecognition.cpp \
+    serialCom.cpp
 
 HEADERS += \
     morphology.h \
-    morphology.h \
     objRecognition.h \
     geometry.h \
-    geometry.h \
-    morphology.h \
-    objRecognition.h \
     serialCom.h \
-    objectfollow.h \
     imgProcess.h \
     nav.h
 
