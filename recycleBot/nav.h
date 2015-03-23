@@ -144,7 +144,7 @@ void nav::moveToObj(string colour, VideoCapture cap){
             else if (dir == 'S'){
                 cout<<"Stopped->Finding Object"<<endl;
                 cvDestroyWindow(imgMoveToObj);
-                waitForSlow(longWaitTime);
+                waitForSlow(500);
                 closeMove(colour);
                 loop = false;
             }
@@ -248,6 +248,7 @@ void nav::closeMove(string colour){
     char m1Dir = '1';
     char m2Speed = '1';
     char m2Dir = '1';
+    int count10;
 
     while(loop){
 
@@ -272,10 +273,18 @@ void nav::closeMove(string colour){
         }
         //End of step forward
         else if(strcmp("10", str) == 0){
-            cout<<"Got to object"<<endl;
-            waitForSlow(longWaitTime);
-            stepperMotor('1', colour);
-            loop = false;
+            count10++;
+            if(count10 >= 10){
+                cout<<"Got to object"<<endl;
+                waitForSlow(longWaitTime);
+                stepperMotor('1', colour);
+                loop = false;
+            }
+            else{
+                cout<<"Counting 10s"<<endl;
+                sendMove(m1Speed, m2Speed, m1Dir, m2Dir);
+                waitForSlow(longWaitTime);
+            }
         }
         //Error
         else{
@@ -303,6 +312,7 @@ void nav::stepperMotor(char dir, string colour){
     //close Serial Port
     ardu.Close();
     startNav(colour);
+    waitForSlow(500);
     loop = false;
 }
 

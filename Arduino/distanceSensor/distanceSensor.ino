@@ -47,10 +47,10 @@ void requestEvent(){
 Get sensor distance from object
 **********************************************************/
 int getSenseDist(){
-  int senseVals = 10;
+  int senseVals = 50;
   int val = 0;
   byte ind;
-  int valThresh = 350;
+  int valThresh = 400;
   for (int i=0; i<senseVals; i++){
     val = val + analogRead(A2);
     delay(1);

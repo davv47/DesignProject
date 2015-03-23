@@ -74,8 +74,11 @@ void receiveEvent(int howMany){
 
 void moveMotors(){
     // Set Motor Speeds
-    M1Speed = serInByte[0]*255/10*1;
-    M2Speed = serInByte[2]*255/10*1.1;
+    int MConst = 255/10*1.5;
+    int M1off = 1;
+    int M2off = 1.2;
+    M1Speed = serInByte[0]*MConst*M2off;
+    M2Speed = serInByte[2]*MConst*M2off;
     
     //M1Dir
     if(serInByte[1] == 0){
