@@ -52,12 +52,14 @@ void nav::startNav(string colour){
     //imgPro.openWebcam(cap);
     checkForStop(1000);
     moveToObj(colour, cap);
+    hasObj = false;
 }
 
 /*moveToObj********************************************************************
  *Function for Robot to follow red object
  * ***************************************************************************/
 void nav::moveToObj(string colour, VideoCapture cap){
+    waitForSlow(500);
     //VideoCapture cap(imgPro.webCamNum);
     imgPro.openWebcam(cap);
 
@@ -144,7 +146,6 @@ void nav::moveToObj(string colour, VideoCapture cap){
             else if (dir == 'S'){
                 cout<<"Stopped->Finding Object"<<endl;
                 cvDestroyWindow(imgMoveToObj);
-                waitForSlow(500);
                 closeMove(colour);
                 loop = false;
             }
@@ -170,6 +171,8 @@ void nav::moveToObj(string colour, VideoCapture cap){
  * Find Object in working area
  * ***************************************************************************/
 void nav::findObj(string colour, VideoCapture cap){
+    waitForSlow(500);
+
     //VideoCapture cap(imgPro.webCamNum);
     imgPro.openWebcam(cap);
 
@@ -240,6 +243,7 @@ void nav::findObj(string colour, VideoCapture cap){
  * fine approach using sensor
  * ***************************************************************************/
 void nav::closeMove(string colour){
+    waitForSlow(500);
     char str[2];
     loop = true;
     waitTime = 2;
@@ -249,6 +253,7 @@ void nav::closeMove(string colour){
     char m2Speed = '1';
     char m2Dir = '1';
     int count10;
+    char actDir;
 
     while(loop){
 
@@ -277,7 +282,15 @@ void nav::closeMove(string colour){
             if(count10 >= 10){
                 cout<<"Got to object"<<endl;
                 waitForSlow(longWaitTime);
-                stepperMotor('1', colour);
+                if (!hasObj){   //If there isnt a object in the actuator, close it
+                    actDir = '1';
+                    hasObj = false;
+                }
+                else{
+                    actDir = '0';
+                    hasObj = true;
+                }
+                stepperMotor(actDir, colour);
                 loop = false;
             }
             else{
@@ -299,6 +312,7 @@ void nav::closeMove(string colour){
  * fine approach using sensor
  * ***************************************************************************/
 void nav::stepperMotor(char dir, string colour){
+    waitForSlow(500);
     loop = true;
     waitTime = 5;
     inBuffer[0] = '4';
