@@ -24,19 +24,38 @@ nav::~nav(){}
  *Function to start navigation class.
  * ***************************************************************************/
 void nav::startNav(string colour){
-    VideoCapture cap(imgPro.webCamNum);
-    //imgPro.openWebcam(cap);
+    userStopped = false;
     checkForStop(1000);
-    moveToObj(colour, cap);
     hasObj = false;
+    while(!hasObj && !userStopped){
+        moveToObj(colour);
+        findObj(colour);
+    }
+    cout<<"At Object Rough Position"<<endl;
+    closeMoveObj();
+    stepperMotor();
+    hasObj = true;
+    cout<<"Got Object"<<endl;
+    while(hasObj && !userStopped){
+        moveToObj(colour);
+        findObj(colour);
+    }
+    cout<<"At Pile Rough Position"<<endl;
+    closeMovePile(colour);
+    stepperMotor();
+    cout<<"Object Sorted"<<endl;
+    leaveArea();
 }
 
 /*moveToObj********************************************************************
  *Function for Robot to follow red object
  * ***************************************************************************/
-void nav::moveToObj(string colour, VideoCapture cap){
-    waitForSlow(500);
-    //VideoCapture cap(imgPro.webCamNum);
+void nav::moveToObj(string colour){
+    if (userStopped){
+        return;
+    }
+    waitForSlow(1000);
+    VideoCapture cap(imgPro.webCamNum);
     imgPro.openWebcam(cap);
 
     //Get centroid of object
@@ -58,26 +77,31 @@ void nav::moveToObj(string colour, VideoCapture cap){
         Point objectPT;
         imgPro.capFrame(cap, imgOut, imgOrig, colour);
         if (!imgOrig.empty()){
+            cout<<"Before Show"<<endl;
             imshow(imgMoveToObj, imgOrig);
+            cout<<"After Show"<<endl;
             checkForStop(1);
         }
-        //imshow("imgBW", imgOut);
-        //Point objectPT = objGeo.centre(imgBW);
         objRecongition objRec;
         objRec.getBound2(imgOut, imgOrig, objectPT, rect);
         objRec.showCentre(imgOrig, objectPT);
-
+        //imshow("imgBW", imgOut);
         int x = objectPT.x;
+        cout<<x<<endl;
         geometry geo;
-        int area = geo.sizeLargest(imgOut, rect);
+        int area;
+        if (x){
+            area = geo.sizeLargest(imgOut, rect);
+        }
+        else{
+            area = 0;
+        }
         if (area < areaNoObj){
             cout<<"Too Small"<<endl;
             cvDestroyWindow(imgMoveToObj);
-            //sendMove('0', '0', '0', '0');
-            //checkForStop(1000);
             waitForSlow(500);
-            findObj(colour, cap);
-            loop = false;
+            return;
+
         }
         else{
             //If no object in frame treat object as in centre of window
@@ -124,20 +148,16 @@ void nav::moveToObj(string colour, VideoCapture cap){
                 cvDestroyWindow(imgMoveToObj);                
                 if (!hasObj){   //If there isnt a object in the actuator, close it
                     actDir = '1';
-                    closeMoveObj(colour);
                     hasObj = true;
+                    return;
                 }
                 else{
                     actDir = '0';
-                    closeMovePile(colour, cap);
                     hasObj = false;
+                    return;
                 }
                 loop = false;
             }
-            /*
-            if (stepDir){
-                loopCount = loopMax;
-            }*/
             if (loop && (stepDir || loopCount == loopMax)){
                 loopCount = 0;
                 waitForSlow(waitTime);
@@ -155,10 +175,10 @@ void nav::moveToObj(string colour, VideoCapture cap){
 /*findObj********************************************************************
  * Find Object in working area
  * ***************************************************************************/
-void nav::findObj(string colour, VideoCapture cap){
-    waitForSlow(500);
-
-    //VideoCapture cap(imgPro.webCamNum);
+void nav::findObj(string colour){
+    if (userStopped) return;
+    waitForSlow(1000);
+    VideoCapture cap(imgPro.webCamNum);
     imgPro.openWebcam(cap);
 
     //Get centroid of object
@@ -170,8 +190,10 @@ void nav::findObj(string colour, VideoCapture cap){
     int areaNoObj = 100;
     waitTime = 2;
     longWaitTime = 10;
-    this->loop = true;
+    loop = true;
+
     namedWindow(imgFindObj, CV_WINDOW_AUTOSIZE);
+
     while(this->loop){
         Point objectPT;
         imgPro.capFrame(cap, imgOut, imgOrig, colour);
@@ -180,15 +202,20 @@ void nav::findObj(string colour, VideoCapture cap){
             checkForStop(1);
         }
 
-        //imshow("imgBW", imgOut);
-        //Point objectPT = objGeo.centre(imgBW);
         objRecongition objRec;
         objRec.getBound2(imgOut, imgOrig, objectPT, rect);
         objRec.showCentre(imgOrig, objectPT);
-
+        //imshow("imgBW", imgOut);
         int x = objectPT.x;
+        cout<<x<<endl;
         geometry geo;
-        int area = geo.sizeLargest(imgOut, rect);
+        int area;
+        if (x){
+            area = geo.sizeLargest(imgOut, rect);
+        }
+        else{
+            area = 0;
+        }
         //Area is too small--contine looking
         if (area < areaNoObj){
             cout<<"Too Small"<<endl;
@@ -212,11 +239,8 @@ void nav::findObj(string colour, VideoCapture cap){
         //Area is big enough--proceed to object
         else{
             cvDestroyWindow(imgFindObj);
-            //sendMove('0', '0', '0', '0');
-            //checkForStop(1000);
             waitForSlow(500);
-            moveToObj(colour, cap);
-            loop = false;
+            return;
         }
     }
     //cvDestroyWindow(imgFindObj);
@@ -225,8 +249,11 @@ void nav::findObj(string colour, VideoCapture cap){
 /*closeMoveObj********************************************************************
  * fine approach using sensor
  * ***************************************************************************/
-void nav::closeMoveObj(string colour){
-    waitForSlow(500);
+void nav::closeMoveObj(){
+    if (userStopped){
+        return;
+    }
+    waitForSlow(1000);
     char str[2];
     loop = true;
     waitTime = 2;
@@ -264,8 +291,7 @@ void nav::closeMoveObj(string colour){
             if(count10 >= 10){
                 cout<<"Got to object"<<endl;
                 waitForSlow(longWaitTime);
-                stepperMotor(colour);
-                loop = false;
+                return;
             }
             else{
                 cout<<"Counting 10s"<<endl;
@@ -285,10 +311,14 @@ void nav::closeMoveObj(string colour){
 /*closeMovePile********************************************************************
  * fine approach using sensor
  * ***************************************************************************/
-void nav::closeMovePile(string colour, VideoCapture cap){
+void nav::closeMovePile(string colour){
+    if (userStopped){
+        return;
+    }
     waitForSlow(500);
-    //VideoCapture cap(imgPro.webCamNum);
+    VideoCapture cap(imgPro.webCamNum);
     imgPro.openWebcam(cap);
+
 
     //Get centroid of object
     Rect rect;
@@ -297,12 +327,15 @@ void nav::closeMovePile(string colour, VideoCapture cap){
     char m2Speed = '1';
     char m2Dir = '1';
 
-    int areaDropOff = 15000;
+    int areaDropOff = 8000;
     waitTime = 2;
     longWaitTime = 100;
     this->loop = true;
 
     namedWindow(imgMoveToObj, CV_WINDOW_AUTOSIZE);
+
+    imgPro.capFrame(cap, imgOut, imgOrig, colour);
+    imshow(imgMoveToObj, imgOrig);
 
     //While program not stopped by user
     while (this->loop){
@@ -321,10 +354,10 @@ void nav::closeMovePile(string colour, VideoCapture cap){
         geometry geo;
         int area = geo.sizeLargest(imgOut, rect);
         if (area > areaDropOff){
+
             cout<<"Got to Pile"<<endl;
             waitForSlow(longWaitTime);
-            stepperMotor(colour);
-            loop = false;
+            return;
         }
         else{
             sendMove(m1Speed, m2Speed, m1Dir, m2Dir);
@@ -334,11 +367,13 @@ void nav::closeMovePile(string colour, VideoCapture cap){
 }
 
 /*stepperMotor********************************************************************
- * fine approach using sensor
+ * Close Or Open stepper motor
  * ***************************************************************************/
-void nav::stepperMotor(string colour){
+void nav::stepperMotor(){
+    if (userStopped){
+        return;
+    }
     waitForSlow(500);
-    loop = true;
     waitTime = 5;
     inBuffer[0] = '4';
     inBuffer[1] = actDir;
@@ -350,9 +385,36 @@ void nav::stepperMotor(string colour){
     ser.ardu.write(inBuffer, BUFFER_SIZE);
     //close Serial Port
     ser.ardu.Close();
-    startNav(colour);
-    waitForSlow(500);
-    loop = false;
+    waitForSlow(1000);
+}
+
+/*leaveArea********************************************************************
+ * Leave Area after object is dropped off
+ * ***************************************************************************/
+void nav::leaveArea(){
+    char m1Speed, m1Dir, m2Speed, m2Dir;
+    waitTime = 2;
+    longWaitTime = 10;
+
+    //Back Off
+    m1Speed = '1';
+    m1Dir = '0';
+    m2Speed = '1';
+    m2Dir = '0';
+    for (int i = 0; i<30; i++){
+        sendMove(m1Speed, m2Speed, m1Dir, m2Dir);
+        waitForSlow(longWaitTime);
+    }
+
+    //Turn Slightly
+    m1Speed = '1';
+    m2Speed = '0';
+    m1Dir = '1';
+    m2Dir = '1';
+    for (int i = 0; i<30; i++){
+        sendMove(m1Speed, m2Speed, m1Dir, m2Dir);
+        waitForSlow(longWaitTime);
+    }
 }
 
 /*waitForSlow********************************************************************
@@ -389,7 +451,7 @@ void nav::waitForSlow(int t){
  * ***************************************************************************/
 void nav::moveLine(int a, char& m1Speed, char& m2Speed, char& m1Dir, char& m2Dir, char& dir){
     char sizeRng;
-    int sizeThresh = 15000;
+    int sizeThresh = 6000;
     int deadZone = 2000/2;
     int sizeSlow = 2000;
     if (a>sizeSlow && a<(sizeThresh-deadZone)) sizeRng = 'N';
@@ -493,4 +555,5 @@ void nav::stopMovement(){
     ser.ardu.Close();
     cout<<"Program stopped by user"<<endl;
     this->loop = false;
+    userStopped = true;
 }

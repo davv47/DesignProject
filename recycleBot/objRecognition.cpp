@@ -29,8 +29,10 @@ void objRecongition::getColour(int &LHue, int &HHue, int &LSat, int &HSat, int &
     Magenta   300 -   359*/
 
     if(colour == "red"){
-        LHue = 0;
-        HHue = 12;
+        //LHue = 0;
+        //HHue = 12;
+        LHue = 125;
+        HHue = 179;
 
         LSat = 125;
         HSat = 255;

@@ -23,27 +23,28 @@ class nav{
 
     serialCom ser;
     imgProcess imgPro;
-    int waitTime;
-    int longWaitTime;
-    bool loop;
-    bool hasObj;
+    int waitTime, longWaitTime;
+    bool loop, hasObj, userStopped;
+
     char actDir;
     Mat imgOrig, imgOut;
     const char* imgFindObj;
     const char* imgMoveToObj;
 
     void startNav(string);
-    void moveToObj(string, VideoCapture);
-    void findObj(string, VideoCapture);
-    void closeMoveObj(string);
-    void closeMovePile(string, VideoCapture);
+    void moveToObj(string);
+    void findObj(string);
+    void closeMoveObj();
+    void closeMovePile(string);
+    void stepperMotor();
+    void leaveArea();
 
     void waitForSlow(int);
     void moveLine(int, char&, char&, char&, char&, char&);
     void checkForStop(int);
     void sendMove(char, char, char, char);
     void stopMovement();
-    void stepperMotor(string);
+
 };
 
 #endif // NAV_H

@@ -43,7 +43,7 @@ void imgProcess::openWebcam(VideoCapture& cap){
 void imgProcess::capFrame(VideoCapture cap, Mat& imgBW, Mat& imgOrig, string colour){
     Mat imgHSV;
     int LHue, HHue, LSat, HSat, LVal, HVal;
-    cap.read(imgOrig); //get video frame
+    cap >> imgOrig; //get video frame
     //imshow("Original Image", imgOrig);
     morphology objMor;
     cvtColor(imgOrig, imgHSV, COLOR_BGR2HSV); //BGR to HSV

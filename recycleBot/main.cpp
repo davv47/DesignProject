@@ -6,6 +6,8 @@
 #include "nav.h"
 #include <SerialStream.h>
 
+#include "objRecognition.h"
+
 #define PORT "/dev/ttyACM0" //Arduinio Device
 using namespace std;
 using namespace LibSerial;
@@ -16,5 +18,7 @@ int main(){
     string colour = "red";
     waitKey(10000);
     run.startNav(colour);
+    /*objRecongition obj;
+    obj.getColorRange();*/
 }
 
