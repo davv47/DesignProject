@@ -67,7 +67,7 @@ void nav::moveToObj(string colour){
     char m1Speed, m2Speed, m1Dir, m2Dir;
     char dir, lastDir;
     int deadX = 25;
-    int areaNoObj = 300;
+    int areaNoObj = 150;
     waitTime = 2;
     longWaitTime = 10;
     this->loop = true;
@@ -191,7 +191,7 @@ void nav::findObj(string colour){
 
     Rect rect;
     char m1Speed, m2Speed, m1Dir, m2Dir;
-    int areaNoObj = 100;
+    int areaNoObj = 200;
     waitTime = 2;
     longWaitTime = 10;
     loop = true;
@@ -331,7 +331,7 @@ void nav::closeMovePile(string colour){
     char m2Speed = '1';
     char m2Dir = '1';
 
-    int areaDropOff = 15000;
+    int areaDropOff = 2500;
     waitTime = 2;
     longWaitTime = 100;
     this->loop = true;
@@ -409,7 +409,7 @@ void nav::leaveArea(){
     m1Dir = '0';
     m2Speed = '1';
     m2Dir = '0';
-    for (int i = 0; i<30; i++){
+    for (int i = 0; i<20; i++){
         sendMove(m1Speed, m2Speed, m1Dir, m2Dir);
         waitForSlow(longWaitTime);
     }
@@ -419,7 +419,7 @@ void nav::leaveArea(){
     m2Speed = '0';
     m1Dir = '1';
     m2Dir = '1';
-    for (int i = 0; i<30; i++){
+    for (int i = 0; i<10; i++){
         sendMove(m1Speed, m2Speed, m1Dir, m2Dir);
         waitForSlow(longWaitTime);
     }
@@ -459,7 +459,7 @@ void nav::waitForSlow(int t){
  * ***************************************************************************/
 void nav::moveLine(int a, char& m1Speed, char& m2Speed, char& m1Dir, char& m2Dir, char& dir){
     char sizeRng;
-    int sizeThresh = 6000;
+    int sizeThresh = 3000;
     int deadZone = 2000/2;
     int sizeSlow = 2000;
     if (a>sizeSlow && a<(sizeThresh-deadZone)) sizeRng = 'N';
@@ -467,6 +467,7 @@ void nav::moveLine(int a, char& m1Speed, char& m2Speed, char& m1Dir, char& m2Dir
     else if (a>=(sizeThresh+deadZone)) sizeRng = 'B';
     else sizeRng = 'S';
     switch (sizeRng){
+
     case 'F':
         dir = 'F'; //normally 'F' limiting to slow forward
         m1Speed = '1';

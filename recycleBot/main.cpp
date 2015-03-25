@@ -15,10 +15,9 @@ using namespace cv;
 
 int main(){
     nav run;
-    string colour = "redDay";
+    string colour = "blue";
     waitKey(10000);
     run.startNav(colour);
     /*objRecongition obj;
     obj.getColorRange();*/
 }
-

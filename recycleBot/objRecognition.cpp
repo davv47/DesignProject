@@ -49,14 +49,14 @@ void objRecongition::getColour(int &LHue, int &HHue, int &LSat, int &HSat, int &
         HVal = 255;
     }
     else if(colour == "blue"){
-        LHue = 105;
-        HHue =135;
+        LHue = 101;
+        HHue =107;
 
-        LSat = 167;
-        HSat = 255;
+        LSat = 89;
+        HSat = 198;
 
         LVal = 0;
-        HVal = 255;
+        HVal = 182;
     }
 
 }
