@@ -88,7 +88,6 @@ void loop(){
       int dir = serInByte[1];      
       Wire.beginTransmission(sdaActIndex);
       //Serial.println("Started");
-      dir = 1;
       Wire.write(dir);
       //Serial.println("Written");
       Wire.endTransmission();

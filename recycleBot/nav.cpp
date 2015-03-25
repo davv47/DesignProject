@@ -26,6 +26,10 @@ nav::~nav(){}
 void nav::startNav(string colour){
     userStopped = false;
     checkForStop(1000);
+    actDir = '1';
+    stepperMotor();
+    actDir ='0';
+    stepperMotor();
     hasObj = false;
     while(!hasObj && !userStopped){
         moveToObj(colour);
@@ -62,7 +66,7 @@ void nav::moveToObj(string colour){
     Rect rect;
     char m1Speed, m2Speed, m1Dir, m2Dir;
     char dir, lastDir;
-    int deadX = 50;
+    int deadX = 25;
     int areaNoObj = 300;
     waitTime = 2;
     longWaitTime = 10;
@@ -327,7 +331,7 @@ void nav::closeMovePile(string colour){
     char m2Speed = '1';
     char m2Dir = '1';
 
-    int areaDropOff = 8000;
+    int areaDropOff = 15000;
     waitTime = 2;
     longWaitTime = 100;
     this->loop = true;
@@ -385,6 +389,7 @@ void nav::stepperMotor(){
     ser.ardu.write(inBuffer, BUFFER_SIZE);
     //close Serial Port
     ser.ardu.Close();
+    cout<<"Moved Stepper Motors Direction: "<<actDir<<endl;
     waitForSlow(1000);
 }
 
@@ -392,6 +397,9 @@ void nav::stepperMotor(){
  * Leave Area after object is dropped off
  * ***************************************************************************/
 void nav::leaveArea(){
+    if (userStopped){
+        return;
+    }
     char m1Speed, m1Dir, m2Speed, m2Dir;
     waitTime = 2;
     longWaitTime = 10;

@@ -20,14 +20,14 @@ int windSB = 11;//red wire
 int windSC = 10;//green wire
 int windSD = 9;//blue wire
 
-int delaySpeed = 100;
+int delaySpeed = 200;
 
 int tp = 7;//Changed to Analog Pin
 int ts = 8; //Changed to Analog Pin
 
 int dir;
 
-int stepperMotorSteps = 200;
+int stepperMotorSteps = 500;
 
 //200 step stepper motor
 //Stepper stpPort = Stepper(stepperMotorSteps, windPA, windPC, windPB, windPD);
@@ -62,10 +62,6 @@ void setup(){
 }
 
 void loop(){
-  /*moveHalfStep(1, 1);
-  delay(1000);
-  moveHalfStep(1, -1);
-  delay(1000);*/
   delay(1);
   
 }
@@ -88,7 +84,7 @@ Code to close actuator flaps
 Runs 'till tactile sensors are triggered
 **********************************************************/
 void moveAct(){
-  int maxStep = 15;//stepperMotorSteps/4*.8; //80% of 90 degree rurn 
+  int maxStep = 7;//stepperMotorSteps/4*.8; //80% of 90 degree rurn 
   int i = 0;
   int dirInd;
   int numSteps = 2;
@@ -143,7 +139,7 @@ void moveHalfStep(int steps, int dir){
     else{
      for(int i = 0;i < 8; i++){
          stepSeq(8-i, windPA, windPB, windPC, windPD);
-         stepSeq(8, windSA, windSB, windSC, windSD);
+         stepSeq(i, windSA, windSB, windSC, windSD);
        delay(delaySpeed);
      }
     }

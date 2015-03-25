@@ -15,7 +15,7 @@ using namespace cv;
 
 int main(){
     nav run;
-    string colour = "red";
+    string colour = "redDay";
     waitKey(10000);
     run.startNav(colour);
     /*objRecongition obj;

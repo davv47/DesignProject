@@ -76,7 +76,7 @@ void moveMotors(){
     // Set Motor Speeds
     int MConst = 255/10*1.5;
     int M1off = 1;
-    int M2off = 1.2;
+    int M2off = 1.4;
     M1Speed = serInByte[0]*MConst*M2off;
     M2Speed = serInByte[2]*MConst*M2off;
     
@@ -109,7 +109,7 @@ void moveMotors(){
   // output pwm to move wheel  
   analogWrite(M1PWM, M1Speed);
   analogWrite(M2PWM, M2Speed);
-  delay(1200);
+  delay(1500);
   analogWrite(M1PWM, 0);
   analogWrite(M2PWM, 0);
 
